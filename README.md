@@ -87,14 +87,14 @@ npm start
 
 🎯 [UrbanDepot Live Demo](https://urbandepot.netlify.app/)
 
----
+
 
 ## 👤 Developer
 
-**Shruti Kadam**  
+**Riya Indap**  
 📧 Email: [riyaindap2000@gmail.com](mailto:riyaindap2000@gmail.com)
 
----
+
 
 ## 📄 License
 
