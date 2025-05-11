@@ -6,8 +6,8 @@
 
 
 ---
-
-![UrbanDepot Preview]([https://github.com/riyaindap7/UrbanDepot/blob/master/public/urbanlogo1.png]) <!-- Replace with actual image URL -->
+<div align="center">
+<img src="https://github.com/riyaindap7/UrbanDepot/blob/master/public/urbanlogo1.png" alt="UrbanDepot Demo" width="400" /></div>
 
 ---
 
