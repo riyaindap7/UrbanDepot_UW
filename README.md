@@ -80,3 +80,27 @@ firebase init
 
 # 4. Run the development server
 npm start
+```
+---
+
+## 🌐 Live Demo
+
+🎯 [UrbanDepot Live Demo](https://urbandepot.netlify.app/)
+
+---
+
+## 👤 Developer
+
+**Shruti Kadam**  
+📧 Email: [riyaindap2000@gmail.com](mailto:riyaindap2000@gmail.com)
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+**Enjoy smarter parking with UrbanDepot!** 🚘✨
+
