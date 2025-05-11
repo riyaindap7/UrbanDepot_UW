@@ -7,7 +7,7 @@
 
 ---
 
-![UrbanDepot Preview](https://your-image-url.com/demo-preview.png) <!-- Replace with actual image URL -->
+![UrbanDepot Preview]([https://your-image-url.com/demo-preview.png](https://github.com/riyaindap7/UrbanDepot/blob/master/public/urbanlogo1.png)) <!-- Replace with actual image URL -->
 
 ---
 
