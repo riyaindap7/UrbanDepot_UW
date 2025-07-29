@@ -2,7 +2,7 @@
   "name": "urban",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "http://.",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@react-google-maps/api": "^2.20.3",
@@ -15,14 +15,14 @@
     "emailjs-com": "^3.2.0",
     "firebase": "^11.0.1",
     "html2canvas": "^1.4.1",
-    "jspdf": "^2.5.2",
+    "jspdf": "^3.0.1",
     "qrcode.react": "^4.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
     "react-router": "^6.27.0",
     "react-router-dom": "^6.27.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "react-toastify": "^10.0.6",
     "react-transition-group": "^4.4.5",
     "swiper": "^11.1.14",
@@ -60,5 +60,17 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "description": "![React](https://img.shields.io/badge/Frontend-React.js-blue) ![Firebase](https://img.shields.io/badge/Backend-Firebase-orange) ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Deployment](https://img.shields.io/badge/Hosted%20on-Netlify-brightgreen)",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riyaindap7/UrbanDepot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/riyaindap7/UrbanDepot/issues"
   }
 }
