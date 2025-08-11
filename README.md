@@ -92,20 +92,3 @@ npm start
 🎯 [UrbanDepot Live Demo](https://urbandepot.netlify.app/)
 
 
-
-## 👤 Developer
-
-**Riya Indap**  
-📧 Email: [riyaindap2000@gmail.com](mailto:riyaindap2000@gmail.com)
-
-
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-**Enjoy smarter parking with UrbanDepot!** 🚘✨
-
->>>>>>> master
