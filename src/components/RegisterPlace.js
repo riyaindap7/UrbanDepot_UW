@@ -21,6 +21,7 @@ const mapsApiKey = process.env.REACT_APP_MAPS_API_KEY;
 const RegisterPlace = () => {
   const [placeName, setPlaceName] = useState('');
   const [address, setAddress] = useState('');
+  const [formerror,setFormerror] = useState(null);
   const [name,setName]=useState('');
   const [parkingNumber, setParkingNumber] = useState('');
   const [fromTime, setFromTime] = useState('');
@@ -58,11 +59,44 @@ const RegisterPlace = () => {
   const totalSteps = 6; // Define the total number of steps
   
 
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+ const handleNext = () => {
+  
+  if (currentStep == 1) {
+    if (!name.trim()) {
+      toast.error("Name cannot be empty");
+      return;
     }
-  };
+  }
+    if (currentStep === 2) {
+    if (!placeName.trim() || !address.trim()) {
+      toast.error('Please fill in all the required fields.');
+      return;
+    }
+  }
+  if( currentStep === 3) {
+    if (!aashaarcard || !nocLetter || !buildingPermission || !placePicture) {
+      toast.error('Please upload all required documents.');
+      return;
+    }
+  }
+  if(currentStep === 4) {
+    if (!parkingNumber.trim() || !fromTime || !toTime || !fromDate || !toDate) {
+      toast.error('Please fill in all the required fields.');
+      return;
+    }
+  }
+
+  if (formerror) {
+    toast.error(formerror);
+    return;
+  }
+  
+  // ✅ No error → go next
+  if (currentStep < totalSteps) {
+    setCurrentStep(currentStep + 1);
+  }
+};
+
 
   const handlePrev = () => {
     if (currentStep > 1) {
@@ -402,7 +436,23 @@ return (
       <input
         type="text"
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => {
+        setName(e.target.value)
+        const nameregx= /^[A-Za-z]+$/
+        console.log(e.target.value.trim()+"is the nae");
+        
+       
+          if(!nameregx.test(e.target.value)){
+
+            setFormerror('Name should contain only alphabets');
+          }
+          else{
+            setFormerror(null);
+          }
+        
+        }
+        }
+      
         placeholder="Your Name"
         required
       />
