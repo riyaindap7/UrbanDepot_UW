@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { auth } from "../firebaseConfig"; 
 import './Home.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import TransitionSection from './TransitionSection';
 import CardSlider from './CardSlider';
 
 const Home = () => {
@@ -11,14 +12,13 @@ const Home = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
 
-  useEffect(() => {
-    const timer = setTimeout(() => setCarLoaded(true), 100);
-    const parkingTimer = setTimeout(() => setParkingVisible(true), 2500);
+   const [backendMsg, setBackendMsg] = useState("");
 
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(parkingTimer);
-    };
+  useEffect(() => {
+    fetch("/api/hello")
+      .then((res) => res.json())
+      .then((data) => setBackendMsg(data.message))
+      .catch((err) => console.error("Error:", err));
   }, []);
 
   const handleLogout = async () => {
@@ -124,6 +124,7 @@ const Home = () => {
 
         <div className="headicon"><h2>Hear from Our Happy Users</h2></div>
         <CardSlider />
+        <TransitionSection />
       </div>
 
       <footer className="new_footer_area bg_color">

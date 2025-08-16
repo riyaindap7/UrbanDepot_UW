@@ -2,18 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import './Map.css';
 import FetchLatLng from './FetchLatLng';
 import { Navigate } from "react-router-dom"; // Import Navigate from react-router-dom
-
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-
 const mapsApiKey = process.env.REACT_APP_MAPS_API_KEY;
-
 const Map = () => {
 
     const [isLoggedIn, setIsLoggedIn] = useState(false); // New state for login status
-
-
     const [places, setPlaces] = useState([]);
     const mapRef = useRef(null);
     const originalCenter = { lat: 19.0760, lng: 72.8777 }; // Original center
@@ -28,16 +20,12 @@ const Map = () => {
     const [directionsSteps, setDirectionsSteps] = useState([]); 
     const [loading, setLoading] = useState(true); // Loading state
 
-
     const [defaultFromDate, setDefaultFromDate] = useState('');
     const [defaultToDate, setDefaultToDate] = useState('');
     const [defaultFromTime, setDefaultFromTime] = useState('');
     const [defaultToTime, setDefaultToTime] = useState('');
 
-  const autocompleteRef = useRef(null);
-
-
-  
+  const autocompleteRef = useRef(null); 
     useEffect(() => {
         // Set default date and time values
         const today = new Date();
@@ -51,8 +39,6 @@ const Map = () => {
         setDefaultFromTime(currentTime);
         setDefaultToTime(oneHourLaterTime);
     }, []);
-
-
 
     const addMarkersForPlaces = (places) => {
         if (!mapInstance) return; // Ensure map is initialized
@@ -92,7 +78,6 @@ const Map = () => {
         });
         };
 
-
     const onFetchPlaces = (newPlaces) => {
         console.log("Fetched places:", newPlaces);
         setPlaces(newPlaces);
@@ -113,8 +98,6 @@ const Map = () => {
                 zoom: originalZoom,
             });
 
-
-
             setMapInstance(map);
             setLoading(false); // Map loading finished
 
@@ -134,7 +117,7 @@ const Map = () => {
                     map.setCenter(userLocation);
                 });
             } else {
-                toast.error("Geolocation is not supported by this browser.");
+                alert("Geolocation is not supported by this browser.");
             }
 
             const renderer = new window.google.maps.DirectionsRenderer();
@@ -147,7 +130,7 @@ const Map = () => {
             autocomplete.addListener("place_changed", () => {
                 const place = autocomplete.getPlace();
                 if (!place.geometry) {
-                    toast.error("No details available for the selected location.");
+                    alert("No details available for the selected location.");
                     return;
                 }
 
@@ -163,9 +146,6 @@ const Map = () => {
         };
         loadScript(`https://maps.googleapis.com/maps/api/js?key=${mapsApiKey}&callback=initMap&libraries=places`);
     }, []);
-
-
-    
 
     useEffect(() => {
         if (mapInstance && places.length > 0) {
@@ -197,11 +177,10 @@ const Map = () => {
         });
     };
 
-
     const searchNearbyPlaces = () => {
         const searchInput = document.getElementById("pac-input").value;
         if (!searchInput) {
-            toast.error("Please enter a location to search.");
+            alert("Please enter a location to search.");
             return;
         }
     
@@ -225,7 +204,7 @@ const Map = () => {
                 // Use filtered places and apply additional filters (time, date, access type) if needed
                 filterPlacesByCriteria(filteredPlaces, searchLocation);
             } else {
-                toast.error("Could not find location: " + status);
+                alert("Could not find location: " + status);
             }
         });
     };
@@ -308,11 +287,10 @@ const Map = () => {
             mapInstance.setZoom(13); // Optional: Adjust zoom level based on proximity
         }
     };
-    
 
      const getDirections = () => {
     if (!directionsRenderer || !userMarker || !selectedPlace) {
-        toast.info("Ensure a place is selected and user location is detected.");
+        alert("Ensure a place is selected and user location is detected.");
         return;
     }
 
@@ -349,7 +327,7 @@ const Map = () => {
             setDirectionsVisible(true);
 
         } else {
-            toast.error("Directions request failed due to " + status);
+            alert("Directions request failed due to " + status);
         }
     });
 };
@@ -371,8 +349,6 @@ const Map = () => {
 
     return (
         <div style={{ position: "relative" }}>
-        <ToastContainer />
-
         <div className={`map ${isMapShrunk ? 'shrunk' : ''}`} ref={mapRef}></div>
         <div className="map-search">
         <h5>Find your perfect parking spot on UrbanDepot </h5>
@@ -539,7 +515,6 @@ const Map = () => {
 }}>
     Close
 </button>
-
 
                 <h4>Directions:</h4>
                 <ul id="direction-list">{directionsSteps}</ul>

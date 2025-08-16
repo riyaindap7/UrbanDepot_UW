@@ -9,8 +9,8 @@
 
 /* body */
 .login-page {
-    position: relative; /* Set position to relative */
     background-image: url("./images/graphic.png");
+    background-color: rgb(10, 9, 9);
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
@@ -29,9 +29,8 @@
     height: 600px;
     border: 3px solid rgba(255, 255, 255, 0.3);
     border-radius: 30px;
+    z-index: 10;
     backdrop-filter: blur(20px);
-    z-index: 2; /* Keep it above the overlay */
-
 }
 
 .col-1 {
@@ -89,9 +88,9 @@
     margin-top: 20px;
 }
 
-.btn1 {
-    font-weight: 600;
-    padding: 9px 30px;
+.btn {
+    font-weight: 500;
+    padding: 5px 30px;
     border: none;
     border-radius: 30px;
     background: rgba(255, 255, 255, 0.2);

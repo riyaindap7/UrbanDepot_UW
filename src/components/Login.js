@@ -1,6 +1,8 @@
-
 import React, { useState, useEffect } from "react";
-import { auth, googleProvider } from "../firebaseConfig";
+import {
+  auth,
+  googleProvider
+} from "../firebaseConfig";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -10,15 +12,11 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import styles from './Login.css';
+import './Login.css';
 import 'boxicons/css/boxicons.min.css';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const [error,setError]= useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
@@ -27,16 +25,13 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Admin credentials
-  const adminEmail = "admin@gmail.com";  // Replace with the actual admin email
-  const adminPassword = "123";  // Replace with the actual admin password
+  const adminEmail = "admin@gmail.com";
+  const adminPassword = "123";
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUserEmail(user.email);
-      } else {
-        setCurrentUserEmail(null);
-      }
+      if (user) setCurrentUserEmail(user.email);
+      else setCurrentUserEmail(null);
     });
     return () => unsubscribe();
   }, []);
@@ -44,59 +39,55 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (email === adminEmail && password === adminPassword) {
-      toast.success("Admin login successful!");
-
       alert("Admin login successful!");
-      navigate("/adminpage");  // Navigate to the admin page
+      navigate("/adminpage");
       return;
     }
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      if (userCredential.user.emailVerified) {
-        alert("Login successful!");
-        navigate("/map");
-      } else {
-        toast.warn("Please verify your email before logging in.");
+
+      if (!userCredential.user.emailVerified) {
+        alert("Please verify your email before logging in.");
+        return;
       }
-    } catch (error) {
-      toast.error(`Error: ${error.message}`);
 
-    }
-  };
+      const token = await userCredential.user.getIdToken();
+      console.log("✅ ID Token:", token);
 
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      alert("Google login successful!");
-      toast.success("Google login successful!");
+      // Test protected route
+      const response = await fetch("http://localhost:5000/api/protected", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
+      const data = await response.json();
+      console.log("✅ Backend Response:", data);
+
+      alert("Login successful!");
       navigate("/map");
+
     } catch (error) {
-      toast.error(`Google Login Error: ${error.message}`);
+      alert(`Login Error: ${error.message}`);
     }
   };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    if (error!="")
-    {
-      toast.error(error);
-      return;
-    }
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match!");
+      alert("Passwords do not match!");
       return;
     }
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      await sendEmailVerification(user);
-      toast.success("Signup successful! Please check your email for verification.");
+      await sendEmailVerification(userCredential.user);
+      alert("Signup successful! Please check your email for verification.");
       navigate("/login");
     } catch (error) {
-      toast.error(`Error: ${error.message}`);
+      alert(`Signup Error: ${error.message}`);
     }
   };
 
@@ -104,115 +95,72 @@ const Login = () => {
     e.preventDefault();
     try {
       await sendPasswordResetEmail(auth, email);
-      toast.info("Password reset email sent! Check your inbox.");
+      alert("Password reset email sent! Check your inbox.");
       setShowForgotPassword(false);
     } catch (error) {
-      toast.error(`Error: ${error.message}`);
+      alert(`Error: ${error.message}`);
     }
   };
 
-  const handleToggle = () => {
-    setIsSignUp(!isSignUp);
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const token = await result.user.getIdToken();
+      console.log("✅ Google Login Token:", token);
+
+      // Optional: send to backend
+      const response = await fetch("http://localhost:5000/api/protected", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      console.log("✅ Backend Google Login Response:", data);
+
+      alert("Google login successful!");
+      navigate("/map");
+
+    } catch (error) {
+      alert(`Google Login Error: ${error.message}`);
+    }
   };
 
   return (
-    <div className="login-page">
-      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
-
+    
       <div className={`form-container ${isSignUp ? "show-signup" : "show-login"}`}>
         <div className="col col-1">
-          <div className="image-layer">
-            <img src="car.png" className="car-bg" />
-          </div>
+          
+            <img src="car.png" className="car-bg" alt="Car" />
+          
           <p className="words">Few Seconds Away From Solving Parking Issue!</p>
         </div>
         <div className="col col-2">
           <div className="btn-box">
-            <button className={`btn1 ${!isSignUp ? "btn-1" : ""}`} onClick={() => setIsSignUp(false)}>
+            <button className={`btn ${!isSignUp ? "btn-1" : ""}`} onClick={() => setIsSignUp(false)}>
               LOG IN
             </button>
-            <button className={`btn1 ${isSignUp ? "btn-2" : ""}`} onClick={() => setIsSignUp(true)}>
+            <button className={`btn ${isSignUp ? "btn-2" : ""}`} onClick={() => setIsSignUp(true)}>
               SIGN UP
             </button>
           </div>
 
+          {/* SIGN UP FORM */}
           <div className={`register-form ${isSignUp ? "active" : ""}`}>
             <div className="form-title"><span>SIGN UP</span></div>
             <form onSubmit={handleSignUp}>
               <div className="form-inputs">
                 <div className="input-box">
-                  <input
-                    className="input-field"
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) =>{
-                      const emailregex = /^[a-zA-Z0-9._%+-]{1,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                      if (emailregex.test(e.target.value))  // Validate email format  
-                        setEmail(e.target.value)
-                      else{
-                        setError("Invalid email format"); 
-                        setEmail(e.target.value)
-                      }}
-                    }
-                    required
-                  />
+                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                   <i className="bx bx-envelope icon"></i>
                 </div>
                 <div className="input-box">
-                  <input
-                    className="input-field"
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => {
-                            const value = e.target.value;
-                            const minLength = 8;
-                            const maxLength = 64;
-
-                            const errors = [];
-
-                            if (value.length < minLength) {
-                              errors.push(`At least ${minLength} characters`);
-                            }
-                            if (value.length > maxLength) {
-                              errors.push(`No more than ${maxLength} characters`);
-                            }
-                            if (!/[a-z]/.test(value)) {
-                              errors.push("At least one lowercase letter");
-                            }
-                            if (!/[A-Z]/.test(value)) {
-                              errors.push("At least one uppercase letter");
-                            }
-                            if (!/[0-9]/.test(value)) {
-                              errors.push("At least one number");
-                            }
-                            if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-                              errors.push("At least one special character");
-                            }
-
-                            if (errors.length === 0) {
-                              setPassword(value);
-                              setError("");
-                            } else {
-                              setPassword(value);
-                              setError("Password must have: " + errors.join(", "));
-                            }
-                  }}
-
-                    required
-                  />
+                  <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                   <i className="bx bx-lock-alt icon"></i>
                 </div>
                 <div className="input-box">
-                  <input
-                    className="input-field"
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
+                  <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                   <i className="bx bx-lock-alt icon"></i>
                 </div>
                 <button className="input-submit" type="submit">
@@ -227,30 +175,17 @@ const Login = () => {
             </button>
           </div>
 
+          {/* LOGIN FORM */}
           <div className={`login-form ${!isSignUp ? "active" : ""}`}>
             <div className="form-title"><span>LOGIN</span></div>
             <form onSubmit={handleLogin}>
               <div className="form-inputs">
                 <div className="input-box">
-                  <input
-                    className="input-field"
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                   <i className="bx bx-envelope icon"></i>
                 </div>
                 <div className="input-box">
-                  <input
-                    className="input-field"
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                   <i className="bx bx-lock-alt icon"></i>
                 </div>
                 <button className="input-submit" type="submit">
@@ -266,9 +201,8 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+    
   );
 };
 
 export default Login;
-

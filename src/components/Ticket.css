@@ -134,7 +134,7 @@ margin-left: 1420px; /* Center horizontally */
 }
 
 /* Button Container */
-.button-ticket {
+.button-container {
   display: flex;
   justify-content: center;
   margin-top: 20px;
@@ -145,7 +145,6 @@ margin-left: 1420px; /* Center horizontally */
   background-color: #000000;
   color: #e5cb0b;
   border: none;
-  height: 60px;
   padding: 7px 20px;
   font-size: 1.3rem;
   border-radius: 40px;
@@ -155,7 +154,6 @@ margin-left: 1420px; /* Center horizontally */
 
 .ticket-button:hover {
   background-color: #daa520;
-  color: #000000;
 }
 
 .ticket-button:focus {

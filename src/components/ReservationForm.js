@@ -8,11 +8,8 @@ import Tesseract from 'tesseract.js'; // Import Tesseract.js
 import './ReservationForm.css';
 import { FaCar, FaMotorcycle, FaTruck, FaBicycle } from "react-icons/fa";
 import ProgressBar from './ProgressBar';
-import FileUploadRes from './FileUploadRes'; // Adjust the path according to your project structure
+import FileUpload from './FileUpload'; // Adjust the path according to your project structure
 import Loading from './Loading'; // Import the Loading component
-
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 
 const generateTimeOptions = () => {
@@ -90,22 +87,7 @@ const ReservationForm = () => {
     return timeOptions.slice(selectedCheckinIndex + 1);
   };
 
-  const validateStep = () => {
-    switch (step) {
-      case 1:
-        return formData.name && formData.email && formData.contactNumber;
-      case 2:
-        return formData.checkinDate && formData.checkoutDate && formData.checkinTime && formData.checkoutTime;
-      case 3:
-        return formData.vehicleType && formData.licensePlate;
-      case 4:
-        return formData.licensePhoto && formData.platePhoto;
-      case 5:
-        return true; // Always allow to proceed to final review
-      default:
-        return false;
-    }
-  };
+
   
   const handleIconClick = (vehicleType) => {
   // Toggle the vehicle type if it's already selected
@@ -143,113 +125,73 @@ const ReservationForm = () => {
         // Run OCR on the license photo to validate it
         if (id === 'licensePhoto') {
             const text = await runOCR(file);
-
             if (text) {
-                // Check if the uploaded document is a valid license
-                if (!isValidLicense(text)) {
-                    setLicenseValidationMessage('The uploaded document is not recognized as a license. Please upload a valid license document.');
-                    return; // Stop further processing if it's not a license
-                }
-
-                // Store the extracted text for further validation if it's recognized as a license
                 setFormData((prevData) => ({
                     ...prevData,
                     extractedName: text.trim(), // Store the extracted name for comparison
                 }));
-
-                // If the document is valid, proceed to name matching
-                validateLicense();
             }
         }
     }
 };
 
-// Function to run OCR
-const runOCR = async (file) => {
+
+  // Function to run OCR
+  const runOCR = async (file) => {
     try {
-        const { data: { text } } = await Tesseract.recognize(file, 'eng', {
-            logger: (m) => console.log(m),
-        });
+      const { data: { text } } = await Tesseract.recognize(file, 'eng', {
+        logger: (m) => console.log(m),
+      });
 
-        setOcrText(text); // Set the OCR text to state
+      setOcrText(text); // Set the OCR text to state
 
-        // Extract name from the OCR text
-        const nameMatch = text.match(/name\s*:\s*([a-zA-Z\s]+)/i);
-        if (nameMatch && nameMatch[1]) {
-            const extractedName = nameMatch[1].trim();
-            setFormData((prevData) => ({
-                ...prevData,
-                extractedName: extractedName,
-            }));
-        } else {
-            setLicenseValidationMessage('Name not found on the license. Please ensure the photo is clear and properly scanned.');
-        }
-        return text; // Return the OCR text for further processing
+      const nameMatch = text.match(/name\s*:\s*([a-zA-Z\s]+)/i);
+      if (nameMatch && nameMatch[1]) {
+        const extractedName = nameMatch[1].trim();
+        setFormData((prevData) => ({
+          ...prevData,
+          extractedName: extractedName
+        }));
+      } else {
+        setLicenseValidationMessage('Name not found on the license. Please ensure the photo is clear and properly scanned.');
+      }
     } catch (error) {
-        console.error('OCR Error:', error);
-        setLicenseValidationMessage('Error during OCR processing. Please try again.');
-        return null; // Return null if OCR fails
+      console.error('OCR Error:', error);
+      setLicenseValidationMessage('Error during OCR processing. Please try again.');
     }
-};
+  };
 
-const validateLicense = () => {
-  console.log("OCR Text:", ocrText); // Log the entire OCR text
-
-  // Extract name from OCR text using a modified regex to allow variations
-  const nameMatch = ocrText.match(/name\s*[:\-]?\s*([a-zA-Z\s]+)/i);
-  const normalizedExtractedName = nameMatch && nameMatch[1]
+  const validateLicense = () => {
+    const nameMatch = ocrText.match(/name\s*:\s*([a-zA-Z\s]+)/i);
+    const normalizedExtractedName = nameMatch && nameMatch[1]
       ? nameMatch[1].replace(/\s+/g, ' ').trim().toUpperCase() // Normalize extracted name
       : '';
 
-  console.log("Extracted Name (before cleaning):", normalizedExtractedName); // Log extracted name after normalization
-
-  // Normalize and clean the user-provided name
-  const normalizedUserName = formData.name
+    const normalizedUserName = formData.name
       .replace(/\s+/g, ' ') // Replace multiple spaces with a single space
       .trim() // Remove leading/trailing whitespace
       .toUpperCase(); // Convert to uppercase
 
-  console.log("User Name (before cleaning):", normalizedUserName); // Log user name after normalization
+    // Clean names to remove non-ASCII characters
+    const cleanedExtractedName = normalizedExtractedName.replace(/[^\x20-\x7E]/g, '');
+    const cleanedUserName = normalizedUserName.replace(/[^\x20-\x7E]/g, '');
 
-  // Additional cleanup to remove any extra trailing characters after the last word in the user's name
-  const extractedNameWords = normalizedExtractedName.split(" ");
-  const userNameWords = normalizedUserName.split(" ");
-  const truncatedExtractedName = extractedNameWords.slice(0, userNameWords.length).join(" ");
+    console.log("Extracted Name:", cleanedExtractedName);
+    console.log("User Name:", cleanedUserName);
 
-  console.log("Truncated Extracted Name:", truncatedExtractedName); // Log truncated name
+    // Compare while allowing for trailing characters
+    const namesMatch = cleanedExtractedName.startsWith(cleanedUserName);
 
-  // Clean names to remove non-ASCII characters
-  const cleanedExtractedName = truncatedExtractedName.replace(/[^\x20-\x7E]/g, '');
-  const cleanedUserName = normalizedUserName.replace(/[^\x20-\x7E]/g, '');
+    if (!namesMatch) {
+        console.error("Names do not match:", cleanedExtractedName, "!==", cleanedUserName);
+    } else {
+        console.log("Names match!");
+    }
 
-  console.log("Cleaned Extracted Name:", cleanedExtractedName); // Log cleaned extracted name
-  console.log("Cleaned User Name:", cleanedUserName); // Log cleaned user name
+    return namesMatch;
+  };
 
-  // Additional debugging: check character codes to detect invisible characters
-  console.log("Extracted Name Characters:", [...cleanedExtractedName].map(c => c.charCodeAt(0)));
-  console.log("User Name Characters:", [...cleanedUserName].map(c => c.charCodeAt(0)));
-
-  // Compare names for exact match
-  const namesMatch = cleanedExtractedName === cleanedUserName;
-
-  if (!namesMatch) {
-      console.log("Names do not match.");
-      console.error("Names do not match:", cleanedExtractedName, "!==", cleanedUserName);
-
-      setLicenseValidationMessage('The name on the license does not match the provided name. Please check and try again.');
-  } else {
-      console.log("Names match!");
-      toast.success("License validation successfull")
-      setLicenseValidationMessage(''); // Clear message if names match
-  }
-
-  return namesMatch;
-};
-
-
-
-// Check if the uploaded document is a valid license
-const isValidLicense = (text) => {
+  const isValidLicense = (text) => {
     const keywords = [
         'DRIVER LICENSE',
         'LICENSE',
@@ -261,22 +203,11 @@ const isValidLicense = (text) => {
     ];
 
     const regex = new RegExp(keywords.join('|'), 'i');
-    const isLicense = regex.test(text);
-    
-    if (!isLicense) {
-        setLicenseValidationMessage('The uploaded document is not recognized as a license. Please upload a valid license document.');
-    }
-    
-    return isLicense;
-};
-
+    return regex.test(text);
+  };
 
   const handleNextStep = () => {
-    if (validateStep()) {
-      setStep((prevStep) => prevStep + 1);
-    } else {
-      toast.error("Please fill in all required fields before proceeding.");
-    }
+    setStep((prevStep) => prevStep + 1);
   };
 
   const handlePrevStep = () => {
@@ -284,113 +215,66 @@ const isValidLicense = (text) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Clear previous error messages
-    setErrorMessage('');
-    setLicenseValidationMessage('');
-    setIsLoading(true);
+  // Clear previous error messages
+  setErrorMessage('');
+  setLicenseValidationMessage('');
+  setIsLoading(true);
 
+  // Validate the license name against the user's name
+  if (!validateLicense()) {
+    setLicenseValidationMessage('The name on the license does not match the provided name. Please upload a valid license.');
+    setIsLoading(false);
+    return;
+  }
 
-    // Calculate the start and end times for the reservation
-    const requestedCheckin = new Date(`${formData.checkinDate}T${formData.checkinTime}:00`);
-    const requestedCheckout = new Date(`${formData.checkoutDate}T${formData.checkoutTime}:00`);
+  try {
+    const formDataToSend = new FormData();
 
-    // Validate the license name against the user's name
-    if (!validateLicense()) {
-      setLicenseValidationMessage('The name on the license does not match the provided name. Please upload a valid license.');
-      setIsLoading(false); // Reset loading state
+    // Append files
+    formDataToSend.append('licensePhoto', formData.licensePhoto);
+    formDataToSend.append('platePhoto', formData.platePhoto);
 
+    // Append the rest of the data as a JSON string
+    const data = {
+      ...formData,
+    };
+    formDataToSend.append('data', JSON.stringify(data));
+
+    const response = await fetch('http://localhost:5000/api/reserve', {
+      method: 'POST',
+      body: formDataToSend,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      setErrorMessage(result.error || 'Reservation failed');
       return;
     }
 
-  // Set total amount based on vehicle type
-// Set total amount based on vehicle type
-let baseAmount = 0;
-if (formData.vehicleType.toLowerCase() === 'car') {
-  baseAmount = 30;
-} else if (formData.vehicleType.toLowerCase() === 'bike') {
-  baseAmount = 20;
-} else if (formData.vehicleType.toLowerCase() === 'scooter') {
-  baseAmount = 20;
-} else if (formData.vehicleType.toLowerCase() === 'bicycle') {
-  baseAmount = 10;
-}
+    // Navigate to payment page with reservation data
+    navigate('/payment', {
+      state: {
+        address: formData.address,
+        place: formData.place,
+        reservationData: result.reservationData,
+      },
+    });
+  } catch (error) {
+    console.error('Error submitting reservation:', error);
+    setErrorMessage('An error occurred while submitting your reservation. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-  // Calculate platform fee (5% of base amount)
-  const platformFee = (baseAmount * 0.05).toFixed(2);
-  const totalAmount = (baseAmount + parseFloat(platformFee)).toFixed(2); // Include platform fee in total
-
-    try {
-      // Check for existing reservations that conflict with the requested times
-      const reservationsRef = collection(db, 'places', formData.place, 'reservations');
-      const snapshot = await getDocs(reservationsRef);
-      
-      let conflict = false;
-
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const existingCheckin = new Date(data.checkin);
-        const existingCheckout = new Date(data.checkout);
-
-        // Check for overlap
-        if (
-          (requestedCheckin >= existingCheckin && requestedCheckin < existingCheckout) || // New check-in is during existing reservation
-          (requestedCheckout > existingCheckin && requestedCheckout <= existingCheckout) || // New check-out is during existing reservation
-          (requestedCheckin <= existingCheckin && requestedCheckout >= existingCheckout) // New reservation fully covers existing
-        ) {
-          conflict = true;
-        }
-      });
-
-      if (conflict) {
-        setErrorMessage("This time slot is already booked. Please choose a different time.");
-        setIsLoading(false); // Reset loading state
-
-        return; 
-      }
-
-      const licensePhotoRef = ref(storage, `licenses/${formData.licensePlate}-${Date.now()}.jpg`);
-      const platePhotoRef = ref(storage, `plates/${formData.licensePlate}-${Date.now()}.jpg`);
-
-      const licenseUploadTask = uploadBytes(licensePhotoRef, formData.licensePhoto);
-      const plateUploadTask = uploadBytes(platePhotoRef, formData.platePhoto);
-
-      const [licenseSnapshot, plateSnapshot] = await Promise.all([licenseUploadTask, plateUploadTask]);
-
-      const licensePhotoURL = await getDownloadURL(licenseSnapshot.ref);
-      const platePhotoURL = await getDownloadURL(plateSnapshot.ref);
-
-    const reservationData = {
-      ...formData,
-      licensePhoto: licensePhotoURL,
-      platePhoto: platePhotoURL,
-      checkin: `${formData.checkinDate} ${formData.checkinTime}`,
-      checkout: `${formData.checkoutDate} ${formData.checkoutTime}`,
-      total_amount: totalAmount,
-      platform_fee: platformFee,
-    };
-      const licensePlateId = `${formData.licensePlate}-${Date.now()}`;
-
-    await setDoc(doc(db, 'places', formData.place, 'reservations', licensePlateId), reservationData);
-    await setDoc(doc(db, 'users', formData.email, 'bookings', licensePlateId), reservationData);
-
-    console.log("Reservation successfully saved!");
-    toast.success("Reservation successfully saved!");
-      navigate('/payment', { state: { address: formData.address, place: formData.place, reservationData } });
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setErrorMessage('An error occurred while submitting your reservation. Please try again.');
-      toast.error("An error occurred while submitting your reservation. Please try again")
-    }finally {
-      setIsLoading(false);
-    }
-
-  };
 
   if (isLoading) {
     return <Loading />; // Show loading component
   }
+
   const renderStep = () => {
     {errorMessage && <div className="error-message">{errorMessage}</div>} {/* Error message display */}
     {licenseValidationMessage && <div className="license-validation-message">{licenseValidationMessage}</div>}
@@ -456,6 +340,7 @@ if (formData.vehicleType.toLowerCase() === 'car') {
             </div>
           </div>
         );
+  
       case 2:
         return (
           <div className="reserve-step2">
@@ -531,6 +416,7 @@ if (formData.vehicleType.toLowerCase() === 'car') {
           </div>
           </div>
         );
+  
       case 3:
         return (
           <div className="reserve-step3">
@@ -603,7 +489,7 @@ if (formData.vehicleType.toLowerCase() === 'car') {
                   <div className='reserve-step4-form'>
                   <h2 class="upload-photos-title">Upload Photos</h2>
                   <div className="reserve-step4-file-upload-container">
-                          <FileUploadRes
+                          <FileUpload 
                               onFileChange={(file) => handleFileChange(file, 'licensePhoto')} // Triggering file change for license photo
                               label="Upload License Photo"
                               required
@@ -611,16 +497,19 @@ if (formData.vehicleType.toLowerCase() === 'car') {
                           />
                       </div>
                       <div className="reserve-step4-file-upload-container">
-                          <FileUploadRes
+                          <FileUpload 
                               onFileChange={(file) => handleFileChange(file, 'platePhoto')} // Triggering file change for plate photo
                               label="Upload Plate Photo"
                               required
                               id="platePhoto"
                           />
                       </div>
+                      <p>{errorMessage}</p> {/* Displaying error message if necessary */}
                   </div>
               </div>
           );
+      
+        
       case 5:
         return (
           <div className="reserve-step5">
@@ -673,33 +562,33 @@ if (formData.vehicleType.toLowerCase() === 'car') {
           </div>
       </div>
     </div>
+
+        
         );
         
       default:
         return null;
     }
   };
-
-return (
-  <div className="reserve-page">
-    {errorMessage && <div className="error-message">{errorMessage}</div>}
-    <ProgressBar
-      currentStep={step}
-      totalSteps={5}
-      onNext={handleNextStep}
-      onPrev={handlePrevStep}
-    />
-    {renderStep()}
-    {step === 5 && (
-      <button className="reserve-page-submit-button" onClick={handleSubmit}>
-        Submit Reservation
-      </button>
-    )}
-    {/* Place ToastContainer here */}
-    <ToastContainer />
-  </div>
-);
-
+  
+  return (
+    <div className="reserve-page">
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
+      <ProgressBar
+        currentStep={step}
+        totalSteps={5}
+        onNext={handleNextStep}
+        onPrev={handlePrevStep}
+      />
+      {renderStep()}
+      {step === 5 && (
+        <button className="reserve-page-submit-button" onClick={handleSubmit}>
+          Submit Reservation
+        </button>
+      )}
+    </div>
+  );
+  
 };
 
 export default ReservationForm;

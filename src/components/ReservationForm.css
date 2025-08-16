@@ -449,6 +449,7 @@ gap: 5vh;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
   width: 100vh;
   height: 60vh;
   margin-top: -20vh;
@@ -459,7 +460,11 @@ gap: 5vh;
  
 }
 
-
+.reserve-step4-file-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 .reserve-step4-custom-file-upload {
   display: flex;
@@ -478,8 +483,7 @@ gap: 5vh;
 }
 .upload-photos-title {
     font-size: 1.5rem; /* Adjust title size as needed */
-    margin-bottom: 24rem; 
-    margin-left: 18px;/* Space below the title */
+    margin-bottom: 1rem; /* Space below the title */
 }
 
 .reserve-step4-custom-file-upload:hover {
@@ -533,7 +537,6 @@ gap: 5vh;
   color: #333;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  margin-left: 660px;
 }
 
 .reserve-step5-text {
@@ -541,19 +544,18 @@ gap: 5vh;
   color: #666;
   font-weight: 400;
 }
+
 /* Container for personal and booking info */
 .review-container {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
-  margin-left: 50vh;
-  height: 47vh;
-  max-width: 800px; /* Restrict max width */
+  margin-left: 400px;
+  max-width: 880px; /* Restrict max width */
   background-color: #ffffff; /* White background */
   border: 1px solid #ddd; /* Light border */
   border-radius: 8px; /* Rounded corners */
-  padding-top: 2vh; /* Add padding */
+  padding: 1.3rem; /* Add padding */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
@@ -563,19 +565,20 @@ gap: 5vh;
   padding: 1rem; /* Add padding */
 }
 
-
+.booking-info {
+  background-color: #f8f9fa; /* Light grey background for booking info */
+}
 
 /* Divider */
 .reserve-step5-divider {
+  width: 1px; /* Thin divider */
   background-color: #ddd;
-  height: 35vh;
-  border-left: 1px solid #ccc;
-  margin: 0 5px;
+  margin: 0 1rem; /* Space around the divider */
 }
 
 /* Title styling for each section */
 .card-title {
-  font-size: 1.2rem; /* Increased title size */
+  font-size: 1.5rem; /* Increased title size */
   color: #333;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -614,12 +617,12 @@ gap: 5vh;
   font-weight: 600;
   border: none;
   border-radius: 8px;
-  padding: 0.5rem 1.5rem; /* Increased padding */
+  padding: 0.75rem 2rem; /* Increased padding */
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
   display: block; /* Centers the button */
-  margin: -3.5rem auto; /* Center the button */
+  margin: 2rem auto; /* Center the button */
 }
 
 /* Hover and active states */
@@ -629,4 +632,6 @@ gap: 5vh;
 
 .reserve-page-submit-button:active {
   transform: scale(0.98); /* Slightly scales down on click */
-} 
+}
+
+

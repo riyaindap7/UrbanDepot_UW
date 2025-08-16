@@ -54,7 +54,7 @@ nav h1 {
     text-decoration: none;
     font-size: 20px; /* Increased font size */
     position: relative;
-    padding: 5px 5px;
+    padding: 20px 25px;
     border-radius: 30px;
     transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
 }
@@ -72,7 +72,7 @@ nav h1 {
     padding: 5px; 
     border: 1.5px solid rgb(122, 122, 122);
     width: 70px;
-    margin-right: 50px;
+    margin-right: 100px;
     cursor: pointer;
     position: relative; /* Added for positioning context */
 }
@@ -160,7 +160,7 @@ nav h1 {
 /* Hover Effects */
 .nav-links a:hover,
 .nav-links a:focus {
-    color: #d4b82c;
+    color: #e5cb0b;
     background-color: rgb(0, 0, 0);
     transform: translateY(-2px);
 

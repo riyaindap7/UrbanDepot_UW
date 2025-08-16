@@ -49,7 +49,6 @@ h2 {
     text-align: left;
     color: #000000;
 }
-
 /* Shifting map in step 4 slightly to the left */
 .step .map {
     margin-left: -2%; /* Adjust value as needed */
@@ -96,7 +95,7 @@ button:hover {
 }
 
 .button-container button:last-child {
-    margin-right: -170px;
+    margin-right: 0;
 }
 
 .error-message {
@@ -331,77 +330,4 @@ textarea {
     overflow-y: auto;
     z-index: 1;
     border: 1px solid red; /* Temporary border for visualization */
-}
-
-
-
-/* Security and Monitoring Labels */
-.register-place-security {
-    margin-bottom: 20px;
-    padding: 15px; /* Add padding for better spacing */
-    border: 1px solid #e0e0e0; /* Light border for separation */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #f9f9f9; /* Subtle background color */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
-}
-
-.register-place-security label {
-    display: inline-block;
-    font-size: 1.1em;
-    color: #333; /* Darker color for better contrast */
-    margin-right: 10px;
-}
-
-/* Checkboxes */
-.register-place-security input[type="checkbox"] {
-    margin-right: 5px;
-    transform: scale(1.5); /* Larger checkboxes for better accessibility */
-    cursor: pointer; /* Change cursor to pointer */
-}
-
-/* Security Guard Details */
-.register-place-guard-name,
-.register-place-guard-contact {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-.register-place-guard-name label,
-.register-place-guard-contact label {
-    font-size: 1.1em;
-    color: #333; /* Darker color for better contrast */
-    margin-bottom: 5px;
-}
-
-.register-place-guard-name input,
-.register-place-guard-contact input {
-    padding: 12px; /* Increased padding for a more spacious feel */
-    font-size: 1em;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Add transition for box-shadow */
-}
-
-.register-place-guard-name input:focus,
-.register-place-guard-contact input:focus {
-    border-color: #000000; /* Change to your primary color */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow effect */
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
-    .register-place-security {
-        padding: 10px; /* Adjust padding for smaller screens */
-    }
-
-    .register-place-security label {
-        font-size: 1em; /* Reduce font size on smaller screens */
-    }
-
-    .register-place-guard-name input,
-    .register-place-guard-contact input {
-        font-size: 0.9em; /* Smaller input font for better fit */
-    }
 }

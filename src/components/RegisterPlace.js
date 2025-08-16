@@ -21,7 +21,6 @@ const mapsApiKey = process.env.REACT_APP_MAPS_API_KEY;
 const RegisterPlace = () => {
   const [placeName, setPlaceName] = useState('');
   const [address, setAddress] = useState('');
-  const [formerror,setFormerror] = useState(null);
   const [name,setName]=useState('');
   const [parkingNumber, setParkingNumber] = useState('');
   const [fromTime, setFromTime] = useState('');
@@ -59,44 +58,11 @@ const RegisterPlace = () => {
   const totalSteps = 6; // Define the total number of steps
   
 
- const handleNext = () => {
-  
-  if (currentStep == 1) {
-    if (!name.trim()) {
-      toast.error("Name cannot be empty");
-      return;
+  const handleNext = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
     }
-  }
-    if (currentStep === 2) {
-    if (!placeName.trim() || !address.trim()) {
-      toast.error('Please fill in all the required fields.');
-      return;
-    }
-  }
-  if( currentStep === 3) {
-    if (!aashaarcard || !nocLetter || !buildingPermission || !placePicture) {
-      toast.error('Please upload all required documents.');
-      return;
-    }
-  }
-  if(currentStep === 4) {
-    if (!parkingNumber.trim() || !fromTime || !toTime || !fromDate || !toDate) {
-      toast.error('Please fill in all the required fields.');
-      return;
-    }
-  }
-
-  if (formerror) {
-    toast.error(formerror);
-    return;
-  }
-  
-  // ✅ No error → go next
-  if (currentStep < totalSteps) {
-    setCurrentStep(currentStep + 1);
-  }
-};
-
+  };
 
   const handlePrev = () => {
     if (currentStep > 1) {
@@ -260,68 +226,61 @@ const RegisterPlace = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true); // Start loading state
-    if (!userEmail) {
-      setErrorMessage('No user is logged in. Please log in to register a place.');
-      return;
+  e.preventDefault();
+
+  if (!placeName || !address || !fromTime || !toTime || !fromDate || !toDate || !name ||
+    landmark.lat === null || landmark.lng === null || !aashaarcard || !nocLetter || !buildingPermission || !placePicture) {
+    toast.error("Please fill all fields and upload all documents");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const formData = new FormData();
+
+    // Add text data
+    const payload = {
+      placeName,
+      address,
+      name,
+      ownerEmail,
+      userEmail,
+      parking_number: parkingNumber || 'N/A',
+      availability: { from: fromTime, to: toTime },
+      dateRange: { from: fromDate, to: toDate },
+      landmark,
+      accessType,
+    };
+
+    formData.append('data', JSON.stringify(payload));
+    formData.append('aashaarcard', aashaarcard);
+    formData.append('nocLetter', nocLetter);
+    formData.append('buildingPermission', buildingPermission);
+    formData.append('placePicture', placePicture);
+
+    const response = await fetch('http://localhost:5000/api/register-place', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      toast.success("Place registered successfully");
+      handleSendEmail(); // Still done from frontend if needed
+      setCurrentStep(1);
+    } else {
+      toast.error(result.error || "Failed to register place");
     }
-  
-    if (!placeName || !address || !fromTime || !toTime || !fromDate || !toDate || !name ||
-      (landmark.lat === null || landmark.lng === null) || !aashaarcard || !nocLetter || !buildingPermission || !placePicture) {  
-      setErrorMessage('Please fill in all the required fields and upload all documents.');
-      toast.error("Please fill in all the required fields and upload all documents.",{
-        style: {
-          fontSize: '16px',
-          borderRadius: '8px',
-          draggable: true,
-        },
-      })
-      return;
-    }
-  
-    try {
-      // Upload files and get URLs
-      const aashaarcardUrl = await uploadFile(aashaarcard);
-      const nocLetterUrl = await uploadFile(nocLetter);
-      const buildingPermissionUrl = await uploadFile(buildingPermission);
-      const placePictureUrl = await uploadFile(placePicture);
-  
-      // Add verified: false to placeData
-      const placeData = {
-        placeName,
-        address,
-        name,
-        ownerEmail,
-        parking_number: parkingNumber || 'N/A',
-        availability: { from: fromTime, to: toTime },
-        dateRange: { from: fromDate, to: toDate },
-        landmark,
-        accessType,
-        verified: false, // Default value set here
-        documents: {
-          aashaarcard: aashaarcardUrl,
-          nocLetter: nocLetterUrl,
-          buildingPermission: buildingPermissionUrl,
-          placePicture: placePictureUrl,
-        },
-      };
-  
-      const userDocRef = doc(db, 'users', userEmail);
-      const registerDocRef = doc(userDocRef, 'register', `${placeName.replace(/\s+/g, '_')}-${Date.now()}`);
-      await setDoc(registerDocRef, placeData);
-  
-      const placesDocRef = doc(db, 'places', placeName.replace(/\s+/g, '_'));
-      await setDoc(placesDocRef, placeData);
-  
-      setErrorMessage('');
-      handleSendEmail();
-      setCurrentStep(1); // Reset to the first step after submission
-    } catch (error) {
-      console.error('Error registering place:', error);
-      setErrorMessage('Error registering place. Please try again.');
-    }
-  };  
+  } catch (error) {
+    console.error('Error:', error);
+    toast.error("Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
   const handleFileChange = (file, setter, isAadhar = false) => {
     console.log("Received file:", file); // Debugging: log the received file
     setter(file);
@@ -354,29 +313,12 @@ const validateAadhaarCard = (ocrText) => {
     return false;
   }
 };
-
-return (
-<div className="form123">
-    {/* Move ToastContainer outside conditional rendering */}
-    <ToastContainer 
-      position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-    />
-    {loading ? ( // Conditionally render loading state
-      <Loading /> // Replace with your loading component
-    ) : (
-      <>
-        <ProgressBar currentStep={currentStep} totalSteps={totalSteps} onNext={handleNext} onPrev={handlePrev} />
-
-        <div className="text123">
-          {currentStep === 1 && (
+  return (
+    <div className='form123'> 
+    <ProgressBar currentStep={currentStep} totalSteps={totalSteps} onNext={handleNext} onPrev={handlePrev} />
+    <div className='text123'>
+    
+    {currentStep === 1 && (
       <>
         {/* <h2>Place Registration Form</h2> */}
         <p className='stepNo'>Step 1</p>
@@ -422,7 +364,7 @@ return (
   </div>
       <div className="register-place-container">
         {/* <h2>Place Registration Form</h2> */}
-        {userName && <h3>Hi, welcome {userName}</h3>}
+        {userName && <h3>HI, welcome {userName}</h3>}
 
         <div className="slider">
           <form onSubmit={handleSubmit} className="register-place-form">
@@ -436,23 +378,7 @@ return (
       <input
         type="text"
         value={name}
-        onChange={(e) => {
-        setName(e.target.value)
-        const nameregx= /^[A-Za-z]+$/
-        console.log(e.target.value.trim()+"is the nae");
-        
-       
-          if(!nameregx.test(e.target.value)){
-
-            setFormerror('Name should contain only alphabets');
-          }
-          else{
-            setFormerror(null);
-          }
-        
-        }
-        }
-      
+        onChange={(e) => setName(e.target.value)}
         placeholder="Your Name"
         required
       />
@@ -615,7 +541,7 @@ return (
                     {useLiveLocation ? 'Use Custom Location' : 'Use Live Location'}
                   </button>
                 </div>
-                <div ref={mapRef} className="map" style={{ width: '100%', height: '401px' }}></div>
+                <div ref={mapRef} className="map" style={{ width: '100%', height: '400px' }}></div>
                 <div className="button-container">
                   
                   <button type="submit">Submit</button>
@@ -698,11 +624,10 @@ return (
         </div>
 
         {errorMessage && <div className="error-message">{errorMessage}</div>}
-        </div>
-      </>
-    )}
-  </div>
-);
+      </div>
+      <ToastContainer />
+    </div>
+  );
 };
 
 export default RegisterPlace;
