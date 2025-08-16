@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebaseConfig';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import './Profile.css';
+import './cssfiles/Profile.css';
 import { FaCar, FaMapMarkerAlt, FaSignOutAlt, FaParking, FaMoneyBill, FaTrash, FaUserCircle, FaBell, FaCog } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css'; 
-import './toastStyles.css';
+import './cssfiles/toastStyles.css';
 import Loading from './Loading'; // Import Loading component
 
 
@@ -221,8 +221,9 @@ const Profile = () => {
     
     
     return (
+        <div className='Profilebackground'>
         <div className="profile-container">
-            <div className="header">
+            <div className="header1">
                 <div className="avatar">
                     {getInitials(userEmail)}
                 </div>
@@ -358,6 +359,7 @@ const Profile = () => {
     
          
             <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} closeOnClick draggable pauseOnHover />
+        </div>
         </div>
     );
 };

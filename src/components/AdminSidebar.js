@@ -1,5 +1,5 @@
 import React from 'react';
-import './AdminSidebar.css';
+import './cssfiles/AdminSidebar.css';
 import { FaChartLine, FaList, FaClipboardList, FaSignOutAlt } from 'react-icons/fa';
 import { auth } from "../firebaseConfig"; // Ensure the path is correct
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
@@ -35,7 +35,7 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
             </div>
             <div className="sidebar-greeting" style={{ padding: '10px', color: 'white', textAlign: 'center', display: 'flex', alignItems: 'center' }}>
                 <div className="avatar" style={{ 
-                    backgroundColor: 'green', 
+                    backgroundColor: '#7a1a32', 
                     color: 'white', 
                     borderRadius: '50%', 
                     width: '66px', 
@@ -63,15 +63,7 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
                     <FaClipboardList className="iconadmin" />
                     <span>Payment History</span>
                 </li>
-                {/* <li onClick={() => setActiveTab('profile')} className={activeTab === 'profile' ? 'active' : ''}>
-                    <FaUserCircle className="icon" />
-                    <span>Profile</span>
-                </li> */}
-                {/* <li onClick={() => setActiveTab('settings')} className={activeTab === 'settings' ? 'active' : ''}>
-                    <FaCog className="icon" />
-                    <span>Settings</span>
-                </li> */}
-                {/* Logout option */}
+                
                 <li onClick={confirmLogout} className="logout">
                     <FaSignOutAlt className="iconadmin" style={{ color: 'red' }} />
                     <span style={{ color: 'red' }}>Logout</span>
