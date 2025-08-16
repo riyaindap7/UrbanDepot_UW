@@ -5,7 +5,7 @@ import { doc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../firebaseConfig';
 import Tesseract from 'tesseract.js'; // Import Tesseract.js
-import './ReservationForm.css';
+import './cssfiles/ReservationForm.css';
 import { FaCar, FaMotorcycle, FaTruck, FaBicycle } from "react-icons/fa";
 import ProgressBar from './ProgressBar';
 import FileUploadRes from './FileUploadRes'; // Adjust the path according to your project structure
@@ -271,17 +271,49 @@ const isValidLicense = (text) => {
 };
 
 
-  const handleNextStep = () => {
-    if (validateStep()) {
-      setStep((prevStep) => prevStep + 1);
-    } else {
-      toast.error("Please fill in all required fields before proceeding.");
-    }
-  };
+const scrollToTop = () => {
+  // Detect the scrolling element
+  const scrollingEl =
+    document.scrollingElement || document.documentElement || document.body;
 
-  const handlePrevStep = () => {
-    setStep((prevStep) => prevStep - 1);
-  };
+  // If your step is inside a specific container with overflow
+  const stepContainer = document.querySelector(".steps-wrapper, .reserve-step");
+  
+  if (stepContainer && stepContainer.scrollHeight > stepContainer.clientHeight) {
+    // Scroll the container
+    stepContainer.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    // Scroll the whole page
+    scrollingEl.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
+const handleNextStep = () => {
+  if (validateStep()) {
+    setStep((prevStep) => {
+      const newStep = prevStep + 1;
+
+      // Scroll after step is updated/rendered
+      setTimeout(scrollToTop, 0);
+
+      return newStep;
+    });
+  } else {
+    toast.error("Please fill in all required fields before proceeding.");
+  }
+};
+
+const handlePrevStep = () => {
+  setStep((prevStep) => {
+    const newStep = prevStep - 1;
+
+    // Scroll after step is updated/rendered
+    setTimeout(scrollToTop, 0);
+
+    return newStep;
+  });
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -465,7 +497,7 @@ if (formData.vehicleType.toLowerCase() === 'car') {
               <p id='reserve-step2-sidetext2'>Let us know when you’ll be arriving and departing so we can reserve the space just for you.</p>
             </div>
             <div className="reserve-step2-form">
-            <h2>Reservation Dates</h2>
+            <p><strong>Reservation Dates</strong></p>
             <div className='reserve-step2-date'>
             <div className='reserve-step2-checkin-date'>
             <label>Check-in Date:</label>
@@ -595,13 +627,14 @@ if (formData.vehicleType.toLowerCase() === 'car') {
         case 4:
           return (
               <div className="reserve-step4">
-                  <div className="reserve-step3-sidetext">
+                  <div className="reserve-step4-sidetext">
                       <p id='step'>Step 4</p>
-                      <p id='reserve-step3-sidetext1'>Verify with Photos</p>
-                      <p id='reserve-step3-sidetext2'>Please upload your license and plate photos. This ensures everything is set for a smooth visit!</p>
+                      <p id='reserve-step4-sidetext1'>Verify with Photos</p>
+                      <p id='reserve-step4-sidetext2'>Please upload your license and plate photos. This ensures everything is set for a smooth visit!</p>
                   </div>
                   <div className='reserve-step4-form'>
-                  <h2 class="upload-photos-title">Upload Photos</h2>
+                  <p class="upload-photos-title">Upload Photos</p>
+                  <div className="upload-con">
                   <div className="reserve-step4-file-upload-container">
                           <FileUploadRes
                               onFileChange={(file) => handleFileChange(file, 'licensePhoto')} // Triggering file change for license photo
@@ -618,8 +651,11 @@ if (formData.vehicleType.toLowerCase() === 'car') {
                               id="platePhoto"
                           />
                       </div>
+                    </div>
                   </div>
-              </div>
+                </div>
+                 
+              
           );
       case 5:
         return (

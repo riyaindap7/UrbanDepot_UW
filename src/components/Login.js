@@ -10,7 +10,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import styles from './Login.css';
+import styles from './cssfiles/Login.css';
 import 'boxicons/css/boxicons.min.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,7 +18,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const [error,setError]= useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
@@ -79,11 +78,6 @@ const Login = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    if (error!="")
-    {
-      toast.error(error);
-      return;
-    }
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");
       return;
@@ -116,13 +110,15 @@ const Login = () => {
   };
 
   return (
-    <div className="login-page">
+    <div className="login-page" style={{
+    backgroundImage: `url("/grey3.jpg")`}}>
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
 
       <div className={`form-container ${isSignUp ? "show-signup" : "show-login"}`}>
         <div className="col col-1">
-          <div className="image-layer">
+          <div className="image-layer" >
             <img src="car.png" className="car-bg" />
+            
           </div>
           <p className="words">Few Seconds Away From Solving Parking Issue!</p>
         </div>
@@ -146,15 +142,7 @@ const Login = () => {
                     type="email"
                     placeholder="Email"
                     value={email}
-                    onChange={(e) =>{
-                      const emailregex = /^[a-zA-Z0-9._%+-]{1,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                      if (emailregex.test(e.target.value))  // Validate email format  
-                        setEmail(e.target.value)
-                      else{
-                        setError("Invalid email format"); 
-                        setEmail(e.target.value)
-                      }}
-                    }
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                   <i className="bx bx-envelope icon"></i>
@@ -165,41 +153,7 @@ const Login = () => {
                     type="password"
                     placeholder="Password"
                     value={password}
-                    onChange={(e) => {
-                            const value = e.target.value;
-                            const minLength = 8;
-                            const maxLength = 64;
-
-                            const errors = [];
-
-                            if (value.length < minLength) {
-                              errors.push(`At least ${minLength} characters`);
-                            }
-                            if (value.length > maxLength) {
-                              errors.push(`No more than ${maxLength} characters`);
-                            }
-                            if (!/[a-z]/.test(value)) {
-                              errors.push("At least one lowercase letter");
-                            }
-                            if (!/[A-Z]/.test(value)) {
-                              errors.push("At least one uppercase letter");
-                            }
-                            if (!/[0-9]/.test(value)) {
-                              errors.push("At least one number");
-                            }
-                            if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-                              errors.push("At least one special character");
-                            }
-
-                            if (errors.length === 0) {
-                              setPassword(value);
-                              setError("");
-                            } else {
-                              setPassword(value);
-                              setError("Password must have: " + errors.join(", "));
-                            }
-                  }}
-
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                   <i className="bx bx-lock-alt icon"></i>
@@ -268,7 +222,9 @@ const Login = () => {
       </div>
     </div>
   );
+
 };
+
 
 export default Login;
 

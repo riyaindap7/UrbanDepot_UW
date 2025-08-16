@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import PropTypes from 'prop-types';
 import db from '../firebaseConfig'; // Import your Firebase Firestore config
-import './FetchLatLng.css'; // Import your CSS file
+import './cssfiles/FetchLatLng.css'; // Import your CSS file
 import Loading from './Loading'; // Import the new Loading component
 
 const FetchLatLng = ({ onFetchPlaces }) => {

@@ -3,7 +3,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { FaDirections } from 'react-icons/fa';
-import './Map.css';
+import './cssfiles/Map.css';
 import FetchLatLng from './FetchLatLng';
 
 const mapsApiKey = process.env.REACT_APP_MAPS_API_KEY;
