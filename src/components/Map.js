@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import './Map.css';
+import './cssfiles/Map.css';
 import FetchLatLng from './FetchLatLng';
 import { Navigate } from "react-router-dom"; // Import Navigate from react-router-dom
 
@@ -345,7 +345,7 @@ const Map = () => {
             ));
             setDirectionsSteps(steps);
             setPopupVisible(false); //closing the popup
-            setIsMapShrunk(true); //shrinking the map on get-diretion event
+            setIsMapShrunk(false); //shrinking the map on get-diretion event
             setDirectionsVisible(true);
 
         } else {
@@ -370,7 +370,8 @@ const Map = () => {
     }
 
     return (
-        <div style={{ position: "relative" }}>
+        <div >
+        <div style={{ position: "relative" }} className="firstmap">
         <ToastContainer />
 
         <div className={`map ${isMapShrunk ? 'shrunk' : ''}`} ref={mapRef}></div>
@@ -429,6 +430,8 @@ const Map = () => {
        
             {/* Popup for displaying selected place details */}
             {popupVisible && (
+                <>
+                <div className="map-popup-overlay" onClick={() => { resetMap(); setPopupVisible(false); }}></div>
                 <div className="map-popup">
                     <div className="map-popup-content">
                     <h3>Place: {selectedPlace.id}</h3>
@@ -504,32 +507,33 @@ const Map = () => {
 </button>
 
 <button
-                            onClick={() => { resetMap(); setPopupVisible(false); }}
-                            style={{
-                                position: 'absolute',
-                                top: '-8px',         // Adjust to desired spacing from the top
-                                left: '234px',        // Adjust to desired spacing from the left
-                                border: 'none',
-                                backgroundColor: 'transparent', // Make the background transparent
-                                color: 'red',      // Set text color to red
-                                fontSize: '24px',    // Increase font size for better visibility
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                zIndex: 1000,        // Ensure the button is above other elements
-                            }}
-                        >
-                            ✖
-                        </button>
+className="map-popup-close"
+    onClick={() => { resetMap(); setPopupVisible(false); }}
+    style={{
+        position: 'absolute',
+        top: '-8px',         // Adjust to desired spacing from the top
+        left: '234px',        // Adjust to desired spacing from the left
+        border: 'none',
+        backgroundColor: 'transparent', // Make the background transparent
+        color: 'red',      // Set text color to red
+        fontSize: '24px',    // Increase font size for better visibility
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        zIndex: 1000,        // Ensure the button is above other elements
+    }}
+>
+     ✖
+    </button>
 
 </div>
 
-                </div>
-                </div>
+    </div>
+        </div></>
             )}
             {directionsSteps.length > 0 && (
             <div className="direction-box">
             <div className={`directions-box-directions ${directionsVisible ? "show":""}`}>
-            <button className="dir_panel-exit-button" onClick={() => {
+<button className="dir_panel-exit-button" onClick={() => {
     if (directionsRenderer) {
         directionsRenderer.setMap(null); // Clear directions from the map
     }
@@ -539,8 +543,6 @@ const Map = () => {
 }}>
     Close
 </button>
-
-
                 <h4>Directions:</h4>
                 <ul id="direction-list">{directionsSteps}</ul>
             </div></div>
@@ -548,6 +550,7 @@ const Map = () => {
 
         <FetchLatLng onFetchPlaces={onFetchPlaces} />
        </div> 
+       </div>
     );
 };
 

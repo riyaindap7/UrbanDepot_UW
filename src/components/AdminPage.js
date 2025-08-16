@@ -2,10 +2,9 @@ import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firesto
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { FaTrash } from 'react-icons/fa'; // Import the trash icon
-
 import db from "../firebaseConfig";
 import AdminSidebar from "./AdminSidebar";
-import "./AdminPage.css";
+import "./cssfiles/AdminPage.css";
 import Forpay from "./ForPay";
 import Loading from "./Loading"; // Import the Loading component
 
@@ -18,55 +17,94 @@ const AdminPage = () => {
   const auth = getAuth(); // Initialize Firebase Auth
 
   // Fetch all registered places
-  const fetchPlaces = async () => {
-    setLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(db, "places"));
-      const fetchedPlaces = [];
+  // const fetchPlaces = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const querySnapshot = await getDocs(collection(db, "places"));
+  //     const fetchedPlaces = [];
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        fetchedPlaces.push({
-          id: doc.id,
-          ...data,
-        });
-      });
+  //     querySnapshot.forEach((doc) => {
+  //       const data = doc.data();
+  //       fetchedPlaces.push({
+  //         id: doc.id,
+  //         ...data,
+  //       });
+  //     });
 
-      setPlaces(fetchedPlaces);
-    } catch (error) {
-      console.error("Error fetching places:", error);
-    } finally {
-      setLoading(false); // Stop loading state
-    }
-  };
+  //     setPlaces(fetchedPlaces);
+  //   } catch (error) {
+  //     console.error("Error fetching places:", error);
+  //   } finally {
+  //     setLoading(false); // Stop loading state
+  //   }
+  // };
+const fetchPlaces = async () => {
+  setLoading(true);
+  try {
+    const response = await fetch("/api/places");
+    const data = await response.json();
+    setPlaces(data);
+  } catch (error) {
+    console.error("Error fetching places:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const handleVerifyPlace = async (placeId) => {
-    try {
-      const placeRef = doc(db, "places", placeId);
-      await updateDoc(placeRef, { verified: true });
-      setPlaces((prevPlaces) =>
-        prevPlaces.map((place) =>
-          place.id === placeId ? { ...place, verified: true } : place
-        )
-      );
-    } catch (error) {
-      console.error("Error verifying place:", error);
-    }
-  };
+  // const handleVerifyPlace = async (placeId) => {
+  //   try {
+  //     const placeRef = doc(db, "places", placeId);
+  //     await updateDoc(placeRef, { verified: true });
+  //     setPlaces((prevPlaces) =>
+  //       prevPlaces.map((place) =>
+  //         place.id === placeId ? { ...place, verified: true } : place
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error("Error verifying place:", error);
+  //   }
+  // };
+const handleVerifyPlace = async (placeId) => {
+  try {
+    await fetch(`/api/places/verify/${placeId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+    });
+    setPlaces(prevPlaces =>
+      prevPlaces.map(place =>
+        place.id === placeId ? { ...place, verified: true } : place
+      )
+    );
+  } catch (error) {
+    console.error("Error verifying place:", error);
+  }
+};
+
+  // const handleDeletePlace = async (placeId) => {
+  //   if (window.confirm("Are you sure you want to delete this place?")) {
+  //     try {
+  //       // Delete from Firestore
+  //       await deleteDoc(doc(db, "places", placeId));
+  //       // Update state to remove the deleted place
+  //       setPlaces((prevPlaces) => prevPlaces.filter(place => place.id !== placeId));
+  //       alert("Place deleted successfully"); // Optional: Add toast notification
+  //     } catch (error) {
+  //       console.error("Error deleting place:", error);
+  //     }
+  //   }
+  // };
 
   const handleDeletePlace = async (placeId) => {
-    if (window.confirm("Are you sure you want to delete this place?")) {
-      try {
-        // Delete from Firestore
-        await deleteDoc(doc(db, "places", placeId));
-        // Update state to remove the deleted place
-        setPlaces((prevPlaces) => prevPlaces.filter(place => place.id !== placeId));
-        alert("Place deleted successfully"); // Optional: Add toast notification
-      } catch (error) {
-        console.error("Error deleting place:", error);
-      }
+  if (window.confirm("Are you sure you want to delete this place?")) {
+    try {
+      await fetch(`/api/places/${placeId}`, { method: "DELETE" });
+      setPlaces(prev => prev.filter(p => p.id !== placeId));
+      alert("Place deleted successfully");
+    } catch (error) {
+      console.error("Error deleting place:", error);
     }
-  };
+  }
+};
 
   useEffect(() => {
     fetchPlaces();

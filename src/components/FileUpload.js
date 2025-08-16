@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./FileUpload.css";
+import "./cssfiles/FileUpload.css";
 
 const uploadIcon = './drag-and-drop.png';
 const FileUpload = ({ onFileChange, label, required, id }) => {

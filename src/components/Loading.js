@@ -1,14 +1,14 @@
 // src/components/Loading.js
 
 import React from 'react';
-import './Loading.css'; // Import the CSS file for styling
-import urbanLogo from './images/urbanlogo1.png'; // Adjust the path if necessary
+import './cssfiles/Loading.css'; // Import the CSS file for styling
+
 
 const Loading = () => {
     return (
         <div className="loading-indicator">
             <div className="logo-animation">
-                <img src={urbanLogo} alt="Loading Urban Depot logo" className="loading-logo" />
+                <img src="/urbanlogo1.png" alt="Loading Urban Depot logo" className="loading-logo" />
             </div>
         </div>
     );
