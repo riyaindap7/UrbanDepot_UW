@@ -3,13 +3,13 @@ import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import db, { auth, storage } from '../firebaseConfig'; 
 import emailjs from 'emailjs-com';
-import './Register.css';
+import './cssfiles/Register.css';
 import { onAuthStateChanged } from 'firebase/auth';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Tesseract from 'tesseract.js';
 import { toast, ToastContainer } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css';
-import './toastStyles.css'; 
+import './cssfiles/toastStyles.css'; 
 import FileUpload from './FileUpload';
 import Loading from './Loading'; // Import your loading component
 
@@ -21,7 +21,6 @@ const mapsApiKey = process.env.REACT_APP_MAPS_API_KEY;
 const RegisterPlace = () => {
   const [placeName, setPlaceName] = useState('');
   const [address, setAddress] = useState('');
-  const [formerror,setFormerror] = useState(null);
   const [name,setName]=useState('');
   const [parkingNumber, setParkingNumber] = useState('');
   const [fromTime, setFromTime] = useState('');
@@ -59,49 +58,18 @@ const RegisterPlace = () => {
   const totalSteps = 6; // Define the total number of steps
   
 
- const handleNext = () => {
-  
-  if (currentStep == 1) {
-    if (!name.trim()) {
-      toast.error("Name cannot be empty");
-      return;
+  const handleNext = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
     }
-  }
-    if (currentStep === 2) {
-    if (!placeName.trim() || !address.trim()) {
-      toast.error('Please fill in all the required fields.');
-      return;
-    }
-  }
-  if( currentStep === 3) {
-    if (!aashaarcard || !nocLetter || !buildingPermission || !placePicture) {
-      toast.error('Please upload all required documents.');
-      return;
-    }
-  }
-  if(currentStep === 4) {
-    if (!parkingNumber.trim() || !fromTime || !toTime || !fromDate || !toDate) {
-      toast.error('Please fill in all the required fields.');
-      return;
-    }
-  }
-
-  if (formerror) {
-    toast.error(formerror);
-    return;
-  }
-  
-  // ✅ No error → go next
-  if (currentStep < totalSteps) {
-    setCurrentStep(currentStep + 1);
-  }
-};
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handlePrev = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
     
 
@@ -120,6 +88,9 @@ const RegisterPlace = () => {
     return () => unsubscribe();
   }, []);
   
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, [currentStep]);
 
   useEffect(() => {
     const loadScript = (src) => {
@@ -373,8 +344,19 @@ return (
       <Loading /> // Replace with your loading component
     ) : (
       <>
-        <ProgressBar currentStep={currentStep} totalSteps={totalSteps} onNext={handleNext} onPrev={handlePrev} />
+       <ProgressBar
+  currentStep={currentStep}
+  totalSteps={totalSteps}
+  onNext={handleNext}
+  onPrev={handlePrev}
+  onSubmit={(e) => {
+    // Prevent page reload
+    e.preventDefault();
+    handleSubmit(e);
+  }}
+/>
 
+        <div className="register-layout-container">
         <div className="text123">
           {currentStep === 1 && (
       <>
@@ -436,23 +418,7 @@ return (
       <input
         type="text"
         value={name}
-        onChange={(e) => {
-        setName(e.target.value)
-        const nameregx= /^[A-Za-z]+$/
-        console.log(e.target.value.trim()+"is the nae");
-        
-       
-          if(!nameregx.test(e.target.value)){
-
-            setFormerror('Name should contain only alphabets');
-          }
-          else{
-            setFormerror(null);
-          }
-        
-        }
-        }
-      
+        onChange={(e) => setName(e.target.value)}
         placeholder="Your Name"
         required
       />
@@ -611,15 +577,15 @@ return (
                 <h3>Set Location on the Map</h3>
                 <div>
                   <input type="text" className='register-s5-loc' ref={inputRef} placeholder="Search for a place" />
-                  <button type="button" onClick={() => setUseLiveLocation(!useLiveLocation)}>
+                  <button type="button" className='liveloc' onClick={() => setUseLiveLocation(!useLiveLocation)}>
                     {useLiveLocation ? 'Use Custom Location' : 'Use Live Location'}
                   </button>
                 </div>
                 <div ref={mapRef} className="map" style={{ width: '100%', height: '401px' }}></div>
-                <div className="button-container">
+                {/* <div className="button-container">
                   
                   <button type="submit">Submit</button>
-                </div>
+                </div> */}
               </div>
             )}
 
@@ -698,6 +664,7 @@ return (
         </div>
 
         {errorMessage && <div className="error-message">{errorMessage}</div>}
+        </div>
         </div>
       </>
     )}

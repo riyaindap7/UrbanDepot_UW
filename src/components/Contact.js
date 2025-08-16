@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Contact.css'; // Import the CSS for styling
+import './cssfiles/Contact.css'; // Import the CSS for styling
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

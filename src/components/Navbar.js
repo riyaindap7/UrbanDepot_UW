@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { auth } from "../firebaseConfig";
-import './Navbar.css';
+import './cssfiles/Navbar.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import urbanLogo from './images/urbanlogo1.png';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -37,15 +37,15 @@ const Navbar = ({ userEmail }) => {
       <div className="urban-navbar-logo">
         {/* Wrap the logo in Link to make it clickable */}
         <Link to="/map">
-          <img src={urbanLogo} alt="Urban Depot Logo" className="urban-logo" />
+          <img src="/urbanlogo1.png" alt="Urban Depot Logo" className="urban-logo" />
         </Link>
-        <h1 className="urban-navbar-title"><strong>URBANDEPOT</strong></h1>
+        <h1 className="urban-navbar-title">urbandepot</h1>
       </div>
       <div className="urban-navbar-links">
         <Link to="/map" className="no-hover" onClick={handleLinkClick}>
           <i className="fas fa-home"></i> 
         </Link>
-        <Link to="/register-place" onClick={handleLinkClick}>LIST YOUR SPACE</Link>
+        <Link to="/register-place" onClick={handleLinkClick}>List Your Space</Link>
         <div className="urban-navbar-dropdown">
           <div className="urban-hamburger-icon" onClick={toggleDropdown}>
             <i className="fas fa-bars"></i>
@@ -66,9 +66,8 @@ const Navbar = ({ userEmail }) => {
     </button>
   </div>
 )}
-
-        </div>
-      </div>
+</div>
+</div>
       {/* renders the email */}
       {userEmail && (
         <div className="urban-navbar-user-info">

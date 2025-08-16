@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import db from '../firebaseConfig';
-import './RazorpayPayment.css';
+import './cssfiles/RazorpayPayment.css';
 import emailjs from 'emailjs-com';
 import Loading from './Loading';
 import { ToastContainer, toast } from 'react-toastify';
