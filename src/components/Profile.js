@@ -61,8 +61,8 @@ const Profile = () => {
     const fetchProfileData = async (email) => {
   try {
     const [bookingsRes, placesRes] = await Promise.all([
-      fetch(`http://localhost:5000/api/profile/bookings/${email}`),
-      fetch(`http://localhost:5000/api/profile/places/${email}`)
+      fetch(`${process.env.REACT_APP_API_URL}/api/profile/bookings/${email}`),
+      fetch(`${process.env.REACT_APP_API_URL}/api/profile/places/${email}`)
     ]);
 
     const bookingsData = await bookingsRes.json();
@@ -109,7 +109,7 @@ const Profile = () => {
   try {
     const user = auth.currentUser;
     if (user) {
-      await fetch(`http://localhost:5000/api/profile/places/${user.email}/${placeId}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/profile/places/${user.email}/${placeId}`, {
         method: "DELETE",
       });
 
@@ -126,7 +126,7 @@ const Profile = () => {
   try {
     const user = auth.currentUser;
     if (user) {
-      await fetch(`http://localhost:5000/api/profile/bookings/${user.email}/${bookingId}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/profile/bookings/${user.email}/${bookingId}`, {
         method: "DELETE",
       });
 

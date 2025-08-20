@@ -94,7 +94,7 @@ const RazorpayPayment = () => {
     // Convert to paise (integer)
     const amountInPaise = Math.round(parseFloat(totalAmount) * 100);
 
-    const orderRes = await fetch('http://localhost:5000/api/create-order', {
+    const orderRes = await fetch(`${process.env.REACT_APP_API_URL}/api/create-order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount: amountInPaise })  // 👈 Send in paise
@@ -114,7 +114,7 @@ const RazorpayPayment = () => {
 
           try {
             // ✅ Step 3: Verify payment in backend
-            const verifyRes = await fetch("http://localhost:5000/api/verify-payment", {
+            const verifyRes = await fetch(`${process.env.REACT_APP_API_URL}/api/verify-payment`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

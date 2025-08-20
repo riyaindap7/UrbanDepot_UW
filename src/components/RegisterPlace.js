@@ -264,7 +264,7 @@ const RegisterPlace = () => {
     formData.append('buildingPermission', buildingPermission);
     formData.append('placePicture', placePicture);
 
-    const response = await fetch('http://localhost:5000/api/register-place', {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/register-place`, {
       method: 'POST',
       body: formData
     });
