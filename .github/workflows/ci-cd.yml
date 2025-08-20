@@ -100,8 +100,6 @@ jobs:
             echo "=== Checking if files are served ==="
             docker exec frontend ls -la /usr/share/nginx/html || true
             exit 1
-      - name: Stop frontend
-        if: always()
 
   deploy:
     runs-on: ubuntu-latest
