@@ -18,6 +18,11 @@ jobs:
         uses: actions/checkout@v4
 
       # --- Backend tests with Docker ---
+      - name: Write serviceAccountKey.json from secret
+        run: echo "$SERVICE_ACCOUNT_KEY_JSON" > backend/serviceAccountKey.json
+        env:
+          SERVICE_ACCOUNT_KEY_JSON: ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}
+          
       - name: Build backend test image
         run: docker build --target test -t backend-test ./backend
 
