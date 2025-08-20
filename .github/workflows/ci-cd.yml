@@ -76,53 +76,30 @@ jobs:
         run: docker rm -f backend || true
 
       # --- Frontend build via Docker & basic check that it serves files ---
-      - name: Build frontend image with build args
-        run: |
-          docker build \
-            --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
-            -t frontend-app .
+      - name: Build frontend image
+        run: docker build -t frontend-app .
 
       - name: Start frontend & smoke check
         run: |
-            echo "Starting frontend container..."
-            docker run -d --name frontend -p 8080:8080 frontend-app
-            
-            echo "Waiting for frontend to be ready..."
+            docker build \
+                --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
+                -t frontend-app .
             for i in {1..30}; do
               if curl -fsS http://localhost:8080/health; then
                 echo "Frontend health check passed"
-                break
+                exit 0
               fi
               echo "Attempt $i: Frontend not ready yet..."
               sleep 2
             done
-            
-            echo "Checking frontend container status..."
-            docker ps -a | grep frontend || true
-            
-            echo "=== Docker logs for frontend ==="
-            docker logs frontend || true
-            
+            echo "Frontend failed to start properly"
+            echo "=== Docker logs ==="
+            docker logs frontend
             echo "=== Checking if nginx is running ==="
             docker exec frontend ps aux || true
-            
             echo "=== Checking if files are served ==="
             docker exec frontend ls -la /usr/share/nginx/html || true
-            
-            echo "=== Testing actual endpoint access ==="
-            curl -v http://localhost:8080/health || true
-            
-            echo "=== Testing main page access ==="
-            curl -v http://localhost:8080/ || true
-            
-            # Final health check
-            if curl -fsS http://localhost:8080/health; then
-              echo "Frontend is healthy"
-            else
-              echo "Frontend failed health check"
-              exit 1
-            fi
-            
+            exit 1
       - name: Stop frontend
         if: always()
         run: docker rm -f frontend || true
