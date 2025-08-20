@@ -22,7 +22,7 @@ jobs:
         run: echo "$SERVICE_ACCOUNT_KEY_JSON" > backend/serviceAccountKey.json
         env:
           SERVICE_ACCOUNT_KEY_JSON: ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}
-          
+
       - name: Build backend test image
         run: docker build --target test -t backend-test ./backend
 
@@ -81,8 +81,9 @@ jobs:
 
       - name: Start frontend & smoke check
         run: |
-            docker run -d --name frontend -p 8080:8080 frontend-app
-            echo "Waiting for frontend to start..."
+            docker build \
+                --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
+                -t frontend-app .
             for i in {1..30}; do
               if curl -fsS http://localhost:8080/health; then
                 echo "Frontend health check passed"

@@ -11,11 +11,16 @@ RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Build the application
+# Accept API URL as build arg
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
+# Build the application with the API URL baked in
 RUN npm run build
 
 # Verify build output
 RUN ls -la /app/build && echo "Build completed successfully"
+
 
 # 2) Serve stage
 FROM nginx:stable-alpine
