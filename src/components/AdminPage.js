@@ -16,7 +16,7 @@ const AdminPage = () => {
   const fetchPlaces = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/places");
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/places`);
       const data = await response.json();
       setPlaces(data);
     } catch (error) {
@@ -28,7 +28,7 @@ const AdminPage = () => {
 
   const handleVerifyPlace = async (placeId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/verify/${placeId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/verify/${placeId}`, {
         method: "POST",
       });
 
@@ -48,7 +48,7 @@ const AdminPage = () => {
   const handleDeletePlace = async (placeId) => {
     if (window.confirm("Are you sure you want to delete this place?")) {
       try {
-        const response = await fetch(`http://localhost:5000/api/places/${placeId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/places/${placeId}`, {
           method: "DELETE",
         });
 

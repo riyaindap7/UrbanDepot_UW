@@ -89,6 +89,7 @@ npm start
 
 ## 🌐 Live Demo
 
-🎯 [UrbanDepot Live Demo](https://urbandepot.netlify.app/)
+🎯 [UrbanDepot Live Demo](https://urban-depot-frontend.onrender.com)
+
 
 

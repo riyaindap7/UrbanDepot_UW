@@ -59,7 +59,7 @@ const Login = () => {
       console.log("✅ ID Token:", token);
 
       // Test protected route
-      const response = await fetch("http://localhost:5000/api/protected", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/protected`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`
@@ -112,7 +112,7 @@ const Login = () => {
       console.log("✅ Google Login Token:", token);
 
       // Optional: send to backend
-      const response = await fetch("http://localhost:5000/api/protected", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/protected`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`

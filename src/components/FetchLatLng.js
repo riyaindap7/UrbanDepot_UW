@@ -13,7 +13,7 @@ const FetchLatLng = ({ onFetchPlaces }) => {
     const fetchPlaces = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:5000/api/fetch-places");
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/fetch-places`);
         const data = await res.json();
         onFetchPlaces(data);
       } catch (err) {

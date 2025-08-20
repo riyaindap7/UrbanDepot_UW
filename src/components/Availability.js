@@ -41,7 +41,7 @@ const Availability = ({ placeId }) => {
   useEffect(() => {
   const fetchData = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/availability/${placeId}`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/availability/${placeId}`);
       const data = await res.json();
       setAvailableTimes(data.availableSlots || []);
     } catch (err) {
