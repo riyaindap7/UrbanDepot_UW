@@ -14,6 +14,9 @@ require('dotenv').config();
 const app = express();
 const PORT = 8080;
 
+// Health check endpoint for CI/CD
+app.get('/healthz', (req, res) => res.status(200).send('OK'));
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
