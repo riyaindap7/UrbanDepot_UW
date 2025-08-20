@@ -79,7 +79,7 @@ jobs:
       - name: Build frontend image with build args
         run: |
           docker build \
-            --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
+            --build-arg REACT_APP_API_URL="${{ secrets.REACT_APP_API_URL }}" \
             -t frontend-app .
 
       - name: Start frontend & smoke check
