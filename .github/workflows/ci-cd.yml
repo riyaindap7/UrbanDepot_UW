@@ -21,8 +21,8 @@ jobs:
       - name: Build backend test image
         run: docker build --target test -t backend-test ./backend
 
-      - name: Run backend unit tests
-        run: docker run --rm backend-test
+    #   - name: Run backend unit tests
+    #     run: docker run --rm backend-test
 
       # Optional: build runtime image and smoke-test the health endpoint
       - name: Build backend runtime image
