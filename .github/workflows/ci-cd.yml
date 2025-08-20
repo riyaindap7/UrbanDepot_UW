@@ -102,7 +102,6 @@ jobs:
             exit 1
       - name: Stop frontend
         if: always()
-        run: docker rm -f frontend || true
 
   deploy:
     runs-on: ubuntu-latest
