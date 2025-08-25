@@ -11,6 +11,9 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 require('dotenv').config();
 
+
+
+
 const app = express();
 const PORT = 8080;
 
@@ -23,6 +26,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const demoRoutes = require("./routes/demo.js");
+app.use("/api", demoRoutes);
 
 // Firebase Admin Init
 admin.initializeApp({
@@ -135,21 +141,42 @@ app.delete('/api/places/:id', async (req, res) => {
     res.status(500).send({ error: 'Delete failed' });
   }
 });
+// ✅ Fetch all bookings for a place (auto-resolve placeId)
+app.get("/api/profile/bookings/place/:placeName", async (req, res) => {
+  try {
+    const { placeName } = req.params;
+    console.log("📌 Fetching bookings for place:", placeName);
 
-// ❌ Don't do login from backend
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+    // Find the Firestore place doc whose ID starts with placeName
+    const placesSnapshot = await db.collection("places").get();
+    const placeDoc = placesSnapshot.docs.find(doc => doc.id.startsWith(placeName));
 
-  // TODO: verify user in DB
-  const user = { id: 1, email }; // Example user object
+    if (!placeDoc) {
+      console.log("⚠️ Place not found for name:", placeName);
+      return res.status(404).json([]);
+    }
 
-  const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
-  
-  res.json({ token });
+    const reservationsRef = placeDoc.ref.collection("reservations");
+    const snapshot = await reservationsRef.get();
+
+    if (snapshot.empty) {
+      console.log("⚠️ No bookings found for place:", placeDoc.id);
+      return res.status(200).json([]);
+    }
+
+    const bookings = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    console.log("✅ Bookings fetched:", bookings);
+    res.status(200).json(bookings);
+
+  } catch (err) {
+    console.error("❌ Error fetching bookings for place:", err);
+    res.status(500).json({ error: "Failed to fetch bookings for this place" });
+  }
 });
-
-
-
 
 
 

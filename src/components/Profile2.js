@@ -18,10 +18,6 @@ const Profile = () => {
     const [selectedPlace, setSelectedPlace] = useState(null); // Currently selected place
     const [loadingPlaceBookings, setLoadingPlaceBookings] = useState(false);
 const [showDemoVideo, setShowDemoVideo] = useState(false);
-const [demoEntryTime, setDemoEntryTime] = useState(null);
-const [demoExitTime, setDemoExitTime] = useState(null);
-
-
 
     const navigate = useNavigate();
 
@@ -37,23 +33,6 @@ const [demoExitTime, setDemoExitTime] = useState(null);
         });
         return () => unsubscribe(); 
     }, [navigate]);
-
-    useEffect(() => {
-  fetch("http://localhost:5000/api/run-demo")
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("✅ API Response:", data);
-      
-      if (data.entryTime) {
-        console.log("Entry Time:", data.entryTime);
-      }
-      if (data.exitTime) {
-        console.log("Exit Time:", data.exitTime);
-      }
-    })
-    .catch((err) => console.error("❌ API Error:", err));
-}, []);
-
 
     const extractNameFromEmail = (email) => {
         const namePart = email.split('@')[0];
@@ -217,28 +196,13 @@ const [demoExitTime, setDemoExitTime] = useState(null);
 
       {/* Button to view live/demo feed */}
       <button
-  className="live-feed-btn"
-  onClick={() => {
-    setShowDemoVideo(true); // show video immediately
+        className="live-feed-btn"
+        onClick={() => setShowDemoVideo(true)}
+      >
+        🎥 View Demo Feed
+      </button>
 
-    // Run demo script asynchronously
-   fetch(`${process.env.REACT_APP_API_URL}/api/run-demo`)
-  .then(res => res.json())
-  .then(data => {
-    console.log("Demo logs:", data.logs);
-    setDemoEntryTime(data.entryTime); // backend should return entryTime
-    setDemoExitTime(data.exitTime);   // backend should return exitTime
-  })
-  .catch(err => console.error("Error running demo:", err));
-
-  }}
->
-  🎥 Run Demo Feed
-</button>
-
-
-
-    {loadingPlaceBookings ? (
+      {loadingPlaceBookings ? (
         <p>Loading...</p>
       ) : (
         placeBookings.length > 0 ? (
@@ -273,15 +237,6 @@ const [demoExitTime, setDemoExitTime] = useState(null);
                     <span className="label">💰 Charge:</span>
                     <span className="value">Rs. {booking.total_amount}</span>
                   </div>
-                  {/* ✅ New rows for detected times */}
-        <div className="detail-row">
-          <span className="label">🟢 Detected Entry Time:</span>
-          <span className="value">{demoEntryTime || "--"}</span>
-        </div>
-        <div className="detail-row">
-          <span className="label">🔴 Detected Exit Time:</span>
-          <span className="value">{demoExitTime || "--"}</span>
-        </div>
                 </div>
               </div>
             ))}
@@ -297,19 +252,15 @@ const [demoExitTime, setDemoExitTime] = useState(null);
 
     {/* Demo video overlay */}
     {showDemoVideo && (
-  <div className="demo-video-overlay">
-    <div className="demo-video-card">
-      <button className="close-overlay-btn" onClick={() => setShowDemoVideo(false)}>Close</button>
-      
-      <video width="640" height="360" controls autoPlay>
-        <source src="/car_demo.mp4" type="video/mp4" />
-      </video>
-
-     
-    </div>
-  </div>
-)}
-
+      <div className="demo-video-overlay">
+        <div className="demo-video-card">
+          <button className="close-overlay-btn" onClick={() => setShowDemoVideo(false)}>Close</button>
+          <video width="640" height="360" controls autoPlay>
+            <source src="/car_demo.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+    )}
   </div>
 )}
 
