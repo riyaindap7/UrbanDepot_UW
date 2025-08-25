@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 import './cssfiles/toastStyles.css';
 
+
 const Profile = () => {
     const [bookings, setBookings] = useState([]);
     const [registeredPlaces, setRegisteredPlaces] = useState([]);
@@ -141,7 +142,7 @@ const [demoExitTime, setDemoExitTime] = useState(null);
     // Utility function
     // Utility function for checking detected times
     const checkDetectedValidity = (booking, entryTime, exitTime) => {
-      if (!entryTime || !exitTime) return "Pending Detection";
+      if (!entryTime || !exitTime) return "Pending Verification";
 
       const checkin = new Date(booking.checkin);
       const checkout = new Date(booking.checkout);
@@ -271,10 +272,7 @@ const [demoExitTime, setDemoExitTime] = useState(null);
           </div>
 
           <div className="booking-details">
-            <div className="detail-row">
-              <span className="label">License Plate:</span>
-              <span className="value">{booking.licensePlate}</span>
-            </div>
+            
 
             <div className="detail-row">
               <span className="label">Check-in:</span>

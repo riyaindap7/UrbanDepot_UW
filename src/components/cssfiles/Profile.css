@@ -370,6 +370,7 @@ body {
   font-weight: 600;
   transition: background 0.25s ease;
   margin-left: -300px;
+  margin-top: 9px;
 }
 
 .live-feed-btn:hover {
