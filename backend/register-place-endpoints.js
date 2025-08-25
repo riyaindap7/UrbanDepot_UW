@@ -42,8 +42,6 @@ app.post("/api/register-place", authenticateToken, upload.fields([
     if (!placeName || !address || !fromTime || !toTime || !fromDate || !toDate || !landmark) {
       return res.status(400).json({ error: "Please fill in all required fields" });
     }
-
-    // Upload files to Firebase Storage
     const fileUrls = {};
     if (req.files) {
       const uploadPromises = [];

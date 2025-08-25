@@ -180,10 +180,7 @@ const Login = () => {
                   />
                   <i className="bx bx-lock-alt icon"></i>
                 </div>
-                <div className="input-box">
-                  <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-                  <i className="bx bx-lock-alt icon"></i>
-                </div>
+                
                 <button className="input-submit" type="submit">
                   <span>Sign Up</span>
                   <i className="bx bx-right-arrow-alt"></i>
@@ -201,11 +198,11 @@ const Login = () => {
             <div className="form-title"><span>LOGIN</span></div>
             <form onSubmit={handleLogin}>
               <div className="form-inputs">
-                <div className="input-box">
+                <div className="input-field">
                   <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                   <i className="bx bx-envelope icon"></i>
                 </div>
-                <div className="input-box">
+                <div className="input-field">
                   <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                   <i className="bx bx-lock-alt icon"></i>
                 </div>

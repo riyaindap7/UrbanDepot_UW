@@ -79,6 +79,7 @@ const App = () => {
         <Route path='/prog' element={<ProgressBar />} />
 
 
+
       </Routes>
     </div>
   );

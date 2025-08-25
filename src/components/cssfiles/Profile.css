@@ -230,3 +230,175 @@ body {
     text-align: center; 
     font-weight: 600; 
 } 
+/* ===========================
+   Overlay Styles
+=========================== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  backdrop-filter: blur(3px);
+}
+
+/* ===========================
+   Main Card (Popup)
+=========================== */
+.overlay-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 12px;
+  width: 600px;
+  max-height: 120vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  text-align: center;
+  animation: fadeInScale 0.3s ease;
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ===========================
+   Booking Cards Inside Overlay
+=========================== */
+.overlay-booking-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.overlay-booking-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  background: #fdfdfd;
+}
+
+/* ===========================
+   Booking Header
+=========================== */
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.booking-header h5 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* ===========================
+   Booking Details
+=========================== */
+.booking-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  padding: 8px 0;
+  border-bottom: 1px dashed #e9e9e9;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 600;
+  color: #555;
+}
+
+.value {
+  font-weight: 500;
+  color: #222;
+}
+
+/* Highlight Charges */
+.detail-row.charge .value {
+  color: #28a745;
+  font-weight: 700;
+}
+
+/* ===========================
+   Buttons
+=========================== */
+.close-overlay-btn {
+  margin-top: 18px;
+  background: #dc3545;
+  color: #fff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.25s ease;
+  margin-left: 1px;
+}
+
+.close-overlay-btn:hover {
+  background: #b02a37;
+}
+
+.live-feed-btn {
+  padding: 8px 15px;
+  background: #010101;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.25s ease;
+  margin-left: -300px;
+  margin-top: 9px;
+}
+
+.live-feed-btn:hover {
+  background: #218838;
+}
+
+/* ===========================
+   Detected Times Section
+=========================== */
+.detected-times {
+  margin-top: 18px;
+  padding: 14px;
+  background: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.detected-times p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+  color: #444;
+}
+.valid-text {
+  color: #16a34a; /* green */
+  font-weight: 700;
+}
+
+.invalid-text {
+  color: #dc2626; /* red */
+  font-weight: 700;
+}
