@@ -138,6 +138,24 @@ const [demoExitTime, setDemoExitTime] = useState(null);
     }
 };
 
+    // Utility function
+    // Utility function for checking detected times
+    const checkDetectedValidity = (booking, entryTime, exitTime) => {
+      if (!entryTime || !exitTime) return "Pending Detection";
+
+      const checkin = new Date(booking.checkin);
+      const checkout = new Date(booking.checkout);
+      const entry = new Date(entryTime);
+      const exit = new Date(exitTime);
+
+      if (entry >= checkin && exit <= checkout) {
+        return "Valid Parking";
+      } else {
+        return "Time Mismatch";
+      }
+    };
+
+
     return (
         <div className='Profilebackground'>
             <div className="profile-container">
@@ -233,66 +251,90 @@ const [demoExitTime, setDemoExitTime] = useState(null);
 
   }}
 >
-  🎥 Run Demo Feed
+    Run Demo Feed
 </button>
 
 
 
     {loadingPlaceBookings ? (
-        <p>Loading...</p>
-      ) : (
-        placeBookings.length > 0 ? (
-          <div className="card-container">
-            {placeBookings.map(booking => (
-              <div key={booking.id} className="overlay-booking-card">
-                <div className="booking-header">
-                  <span className={`badge1 ${getBookingStatus(booking).toLowerCase()}`}>
-                    {getBookingStatus(booking)}
-                  </span>
-                  <h5>Booking #{booking.id}</h5>
-                </div>
-
-                <div className="booking-details">
-                  <div className="detail-row">
-                    <span className="label">🚗 License Plate:</span>
-                    <span className="value">{booking.licensePlate}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="label">📅 Check-in:</span>
-                    <span className="value">{booking.checkin}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="label">🕒 Check-out:</span>
-                    <span className="value">{booking.checkout}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="label">🚙 Vehicle Type:</span>
-                    <span className="value">{booking.vehicleType}</span>
-                  </div>
-                  <div className="detail-row charge">
-                    <span className="label">💰 Charge:</span>
-                    <span className="value">Rs. {booking.total_amount}</span>
-                  </div>
-                  {/* ✅ New rows for detected times */}
-        <div className="detail-row">
-          <span className="label">🟢 Detected Entry Time:</span>
-          <span className="value">{demoEntryTime || "--"}</span>
-        </div>
-        <div className="detail-row">
-          <span className="label">🔴 Detected Exit Time:</span>
-          <span className="value">{demoExitTime || "--"}</span>
-        </div>
-                </div>
-              </div>
-            ))}
+  <p>Loading...</p>
+) : (
+  placeBookings.length > 0 ? (
+    <div className="card-container">
+      {placeBookings.map((booking) => (
+        <div key={booking.id} className="overlay-booking-card">
+          <div className="booking-header">
+            <span className={`badge1 ${getBookingStatus(booking).toLowerCase()}`}>
+              {getBookingStatus(booking)}
+            </span>
+            <h5>Booking #{booking.id}</h5>
           </div>
-        ) : (
-          <p>No bookings for this place.</p>
-        )
-      )}
 
-      {/* Close overlay */}
-      <button className="close-overlay-btn" onClick={() => setSelectedPlace(null)}>Close</button>
+          <div className="booking-details">
+            <div className="detail-row">
+              <span className="label">License Plate:</span>
+              <span className="value">{booking.licensePlate}</span>
+            </div>
+
+            <div className="detail-row">
+              <span className="label">Check-in:</span>
+              <span className="value">{booking.checkin}</span>
+            </div>
+
+            <div className="detail-row">
+              <span className="label">Check-out:</span>
+              <span className="value">{booking.checkout}</span>
+            </div>
+
+            <div className="detail-row">
+              <span className="label">Vehicle Type:</span>
+              <span className="value">{booking.vehicleType}</span>
+            </div>
+
+            <div className="detail-row charge">
+              <span className="label">Charge:</span>
+              <span className="value">Rs. {booking.total_amount}</span>
+            </div>
+
+            {/* Detected Times */}
+            <div className="detail-row">
+              <span className="label">Detected Entry Time:</span>
+              <span className="value">{demoEntryTime || "--"}</span>
+            </div>
+
+            <div className="detail-row">
+              <span className="label">Detected Exit Time:</span>
+              <span className="value">{demoExitTime || "--"}</span>
+            </div>
+<div className="detail-row">
+  <span className="label">Validation:</span>
+  <span
+    className={`value ${
+      checkDetectedValidity(booking, demoEntryTime, demoExitTime) === "Valid Parking"
+        ? "valid-text"
+        : "invalid-text"
+    }`}
+  >
+    {checkDetectedValidity(booking, demoEntryTime, demoExitTime)}
+  </span>
+</div>
+
+
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p>No bookings for this place.</p>
+  )
+)}
+
+{/* Close overlay */}
+<button className="close-overlay-btn" onClick={() => setSelectedPlace(null)}>
+  Close
+</button>
+
+
     </div>
 
     {/* Demo video overlay */}
