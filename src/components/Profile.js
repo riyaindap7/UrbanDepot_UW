@@ -138,9 +138,6 @@ const [demoExitTime, setDemoExitTime] = useState(null);
         setLoadingPlaceBookings(false);
     }
 };
-
-    // Utility function
-    // Utility function for checking detected times
     const checkDetectedValidity = (booking, entryTime, exitTime) => {
       if (!entryTime || !exitTime) return "Pending Verification";
 
