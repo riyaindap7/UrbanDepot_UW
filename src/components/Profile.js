@@ -7,7 +7,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 import './cssfiles/toastStyles.css';
 
-
 const Profile = () => {
     const [bookings, setBookings] = useState([]);
     const [registeredPlaces, setRegisteredPlaces] = useState([]);
@@ -176,6 +175,13 @@ const [demoExitTime, setDemoExitTime] = useState(null);
                     <button className={`tab-buttonpro ${activeTab === 'settings' ? 'active-tab' : ''}`} onClick={() => handleTabClick('settings')}>
                         <FaCog /> <span>Settings</span>
                     </button>
+                    <button 
+  className={`tab-buttonpro ${activeTab === 'documents' ? 'active-tab' : ''}`} 
+  onClick={() => handleTabClick('documents')}
+>
+  <FaTrash /> <span>Documents</span>
+</button>
+
                 </div>
 
                 {activeTab === 'bookings' && (
@@ -202,6 +208,32 @@ const [demoExitTime, setDemoExitTime] = useState(null);
                         ) : (<p>No bookings found.</p>)}
                     </div>
                 )}
+
+
+                {activeTab === 'documents' && (
+  <div className="section">
+    <h3 className="section-heading">Your Documents</h3>
+
+    <div className="card-container">
+      <div className="card">
+        <h4>Aadhaar Card</h4>
+
+        {/* Directly show Aadhaar image */}
+        {registeredPlaces.length > 0 && registeredPlaces[0].documents?.aashaarcard ? (
+          <img 
+            src={registeredPlaces[0].documents.aashaarcard} 
+            alt="Aadhaar Card" 
+            style={{ width: "100%", maxWidth: "400px", borderRadius: "8px" }} 
+          />
+        ) : (
+          <p>No Aadhaar available.</p>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+
 
                 {activeTab === 'places' && (
                     <div className="section">

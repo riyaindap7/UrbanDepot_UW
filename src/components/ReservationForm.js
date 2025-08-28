@@ -10,7 +10,7 @@ import { FaCar, FaMotorcycle, FaTruck, FaBicycle } from "react-icons/fa";
 import ProgressBar from './ProgressBar';
 import FileUpload from './FileUpload'; // Adjust the path according to your project structure
 import Loading from './Loading'; // Import the Loading component
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
@@ -349,30 +349,47 @@ const handlePrevStep = () => {
   const handleSubmit = async (e) => {
   e.preventDefault();
 
-  // Clear previous error messages
   setErrorMessage('');
   setLicenseValidationMessage('');
   setIsLoading(true);
 
-  // Validate the license name against the user's name
+  // ✅ Step 1: Validate license
   if (!validateLicense()) {
-    setLicenseValidationMessage('The name on the license does not match the provided name. Please upload a valid license.');
+    setLicenseValidationMessage(
+      'The name on the license does not match the provided name. Please upload a valid license.'
+    );
     setIsLoading(false);
     return;
   }
 
   try {
-    const formDataToSend = new FormData();
+    // ✅ Step 2: Check if slot is already booked
+    const availabilityCheck = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/bookings/checkAvailability`, // <-- make sure matches backend
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          place: formData.place,
+          checkin: `${formData.checkinDate}T${formData.checkinTime}`,
+          checkout: `${formData.checkoutDate}T${formData.checkoutTime}`,
+        }),
+      }
+    );
 
-    // Append files
+    const availabilityResult = await availabilityCheck.json();
+
+    if (!availabilityCheck.ok || !availabilityResult.available) {
+      toast.error('❌ This slot is already booked. Please choose another.');
+      setIsLoading(false);
+      return;
+    }
+
+    // ✅ Step 3: If available, continue with reservation submission
+    const formDataToSend = new FormData();
     formDataToSend.append('licensePhoto', formData.licensePhoto);
     formDataToSend.append('platePhoto', formData.platePhoto);
-
-    // Append the rest of the data as a JSON string
-    const data = {
-      ...formData,
-    };
-    formDataToSend.append('data', JSON.stringify(data));
+    formDataToSend.append('data', JSON.stringify(formData));
 
     const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reserve`, {
       method: 'POST',
@@ -382,11 +399,11 @@ const handlePrevStep = () => {
     const result = await response.json();
 
     if (!response.ok) {
-      setErrorMessage(result.error || 'Reservation failed');
+      toast.error(result.error || 'Reservation failed');
+      setIsLoading(false);
       return;
     }
 
-    // Navigate to payment page with reservation data
     navigate('/payment', {
       state: {
         address: formData.address,
@@ -396,16 +413,14 @@ const handlePrevStep = () => {
     });
   } catch (error) {
     console.error('Error submitting reservation:', error);
-    setErrorMessage('An error occurred while submitting your reservation. Please try again.');
+    toast.error("This slot is already booked. Please choose another one.");
   } finally {
     setIsLoading(false);
   }
 };
 
+{isLoading && <Loading />}  // Overlay spinner, but don't unmount form
 
-  if (isLoading) {
-    return <Loading />; // Show loading component
-  }
 
   const renderStep = () => {
     {errorMessage && <div className="error-message">{errorMessage}</div>} {/* Error message display */}
@@ -708,6 +723,7 @@ const handlePrevStep = () => {
   
   return (
     <div className="reserve-page">
+      <ToastContainer /> {/* <-- Add this line */}
       {errorMessage && <div className="error-message">{errorMessage}</div>}
       <ProgressBar
         currentStep={step}
