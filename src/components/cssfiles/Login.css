@@ -378,14 +378,26 @@
     margin-bottom: 10px;
   }
 
-  .input-field {
-    width: 95%;
-    font-size: 14px;
-    padding: 0 12px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-  }
+.input-field {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding-right: 10px;
+}
+
+.input-field i {
+  font-size: 18px;
+  color: #fff;
+  margin-left: 8px;
+}
+.input-field input {
+  color: #fff !important;
+  line-height: 50px !important;
+}
+
+
+
 
   .input-submit,
   .google-btn {

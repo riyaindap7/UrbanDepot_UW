@@ -71,6 +71,64 @@ app.get("/api/protected", authenticateToken, (req, res) => {
 // ============================
 // 🔻 Admin routes below
 // ============================
+app.post("/api/bookings/checkAvailability", async (req, res) => {
+  try {
+    const { place, checkin, checkout } = req.body;
+
+    if (!place || !checkin || !checkout) {
+      return res.status(400).json({ available: false, error: "Missing data" });
+    }
+
+    const checkinDate = new Date(checkin);
+    const checkoutDate = new Date(checkout);
+
+    // ✅ Get today's date range
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // ✅ Fetch all reservations for this place
+    const reservationsRef = db.collection("places").doc(place).collection("reservations");
+    const snapshot = await reservationsRef.get();
+    const todayBookings = snapshot.docs
+      .map(doc => doc.data())
+      .filter(b => {
+        const bCheckin = new Date(b.checkin);
+        const bCheckout = new Date(b.checkout);
+        // Filter bookings that overlap with today
+        return bCheckin < endOfDay && bCheckout > startOfDay;
+      });
+
+    console.log("📌 Availability check for place:", place);
+    console.log("🕒 Requested:", checkinDate.toISOString(), "→", checkoutDate.toISOString());
+    console.log("📅 Today bookings for this place:");
+    todayBookings.forEach(b => {
+      console.log(`   ➡️ ${b.checkin} → ${b.checkout}`);
+    });
+
+    // ✅ Overlap check with requested slot
+    const overlapping = todayBookings.find(b => {
+      const bCheckin = new Date(b.checkin);
+      const bCheckout = new Date(b.checkout);
+      return bCheckin < checkoutDate && bCheckout > checkinDate;
+    });
+
+    if (overlapping) {
+      console.log("❌ Slot overlaps with:", overlapping.checkin, "→", overlapping.checkout);
+      return res.json({ available: false, todayBookings });
+    }
+
+    console.log("✅ Slot is free");
+    return res.json({ available: true, todayBookings });
+
+  } catch (err) {
+    console.error("❌ Availability check error:", err);
+    res.status(500).json({ available: false, error: "Server error" });
+  }
+});
+
 
 app.get("/api/places", async (req, res) => {
   try {

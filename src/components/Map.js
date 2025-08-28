@@ -3,6 +3,8 @@ import './cssfiles/Map.css';
 import FetchLatLng from './FetchLatLng';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { db } from '../firebaseConfig';
+import { collection, onSnapshot } from "firebase/firestore";
 
 import { Navigate } from "react-router-dom"; // Import Navigate from react-router-dom
 const mapsApiKey = process.env.REACT_APP_MAPS_API_KEY;
@@ -51,6 +53,10 @@ const Map = () => {
         setSearchMarkers([]);
 
         places.forEach(place => {
+            if (typeof place.lat !== "number" || typeof place.lng !== "number") {
+                console.warn("Invalid lat/lng for place:", place);
+                return; // Skip this marker
+              }
             const marker = new window.google.maps.Marker({
                 position: { lat: place.lat, lng: place.lng },
                 map: mapInstance,
@@ -151,10 +157,11 @@ const Map = () => {
     }, []);
 
     useEffect(() => {
-        if (mapInstance && places.length > 0) {
-            addMarkersForPlaces(places); // Highlighted change
-        }
-    }, [mapInstance, places]);
+  if (mapInstance && places.length > 0) {
+    addMarkersForPlaces(places);
+  }
+}, [mapInstance, places]);
+
 
 
     const addMarkersForFetchedPlaces = (fetchedPlaces) => {
@@ -282,7 +289,7 @@ const Map = () => {
                 setPopupVisible(true);
             });
     
-            setSearchMarkers(prevMarkers => [...prevMarkers, marker]);
+setSearchMarkers(prevMarkers => [...prevMarkers, marker]);
         });
     
         if (searchLocation) {
@@ -349,6 +356,36 @@ const Map = () => {
             mapInstance.setZoom(originalZoom); // Reset to original zoom
         }
     }
+
+useEffect(() => {
+  const unsubscribe = onSnapshot(collection(db, "places"), (snapshot) => {
+    setPlaces((prevPlaces) => {
+      let updated = [...prevPlaces];
+
+      snapshot.docChanges().forEach((change) => {
+        const data = { id: change.doc.id, ...change.doc.data(), 
+          lat: change.doc.data().landmark?.lat,
+          lng: change.doc.data().landmark?.lng
+        };
+
+        if (change.type === "added") {
+          updated.push(data);
+        }
+        if (change.type === "modified") {
+          updated = updated.map((p) => (p.id === data.id ? data : p));
+        }
+        if (change.type === "removed") {
+          updated = updated.filter((p) => p.id !== data.id);
+        }
+      });
+
+      return updated;
+    });
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
     return (
         <div >
