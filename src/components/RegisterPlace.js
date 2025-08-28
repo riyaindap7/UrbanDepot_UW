@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import db, { auth, storage } from '../firebaseConfig'; 
 import emailjs from 'emailjs-com';
@@ -41,7 +41,7 @@ const RegisterPlace = () => {
   const [guardName, setGuardName] = useState(''); // State for security guard's name
   const [guardContact, setGuardContact] = useState(''); // State for security guard's contact
   
-
+const [aadhaarUrl, setAadhaarUrl] = useState(null);
   const [aashaarcard, setAadharCard] = useState(null);
   const [nocLetter, setNocLetter] = useState(null);
   const [buildingPermission, setBuildingPermission] = useState(null);
@@ -201,7 +201,40 @@ const RegisterPlace = () => {
         setLoading(false); // End loading
       });
   };
+
   
+
+  useEffect(() => {
+    const fetchAadhaar = async () => {
+      try {
+        if (!userEmail) return;
+
+        // go inside user -> register subcollection
+        const registerRef = collection(db, "users", userEmail, "register");
+        const snapshot = await getDocs(registerRef);
+
+        if (!snapshot.empty) {
+          // pick first place (you can loop if you want multiple)
+          const firstPlaceDoc = snapshot.docs[0];
+          const data = firstPlaceDoc.data();
+
+          if (data.documents?.aashaarcard) {
+            setAadhaarUrl(data.documents.aashaarcard);
+          } else {
+            setAadhaarUrl(null);
+          }
+        } else {
+          setAadhaarUrl(null);
+        }
+      } catch (error) {
+        console.error("Error fetching Aadhaar:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAadhaar();
+  }, [userEmail]);
 
   const processOCR = async (file) => {
     try {
@@ -461,47 +494,58 @@ return (
 
             {/* Step 2: Document Uploads */}
             {currentStep === 3 && (
-              <div className="step">
-                 <div className="row1">
-                 <label className="flabel">Upload Aadhaar Card:</label>
-               <FileUpload
-                    id="aadhar"
-                    // label="Upload Aadhaar Card:"
-                    className='register-s3-u'
-                    required
-                    onFileChange={(file) => handleFileChange(file, setAadharCard, true)} // Trigger Aadhaar validation
-                  />
-                    <label className="flabel">Upload NOC Letter:</label>
-                    <FileUpload
-                      id="noc"
-                      // label="Upload NOC Letter:"
-                      className='register-s3-u'
-                      required
-                      onFileChange={(file) => handleFileChange(file, setNocLetter)} // No Aadhaar validation here
-                    />
-                    </div>
-                    <div className="row1">
-                    <label className="flabel">Upload Building Permission Letter:</label>
-                    <FileUpload
-                      id="buildingPermission"
-                      // label="Upload Building Permission Letter:"
-                      className='register-s3-u'
-                      required
-                      onFileChange={(file) => handleFileChange(file, setBuildingPermission)} // Correctly handle Building Permission
-                    />
-                    <label className="flabel">Upload Picture of the Place:</label>
-                    <FileUpload
-                      id="placePicture"
-                      // label="Upload Picture of the Place:"
-                      className='register-s3-u'
-                      required
-                      onFileChange={(file) => handleFileChange(file, setPlacePicture)} // Correctly handle Place Picture
-                    />
-                    </div>
+  <div className="step">
+    <div className="row1">
+      {/* Aadhaar Upload / Preview */}
+<label className="flabel">Upload Aadhaar Card:</label>
+{aadhaarUrl ? (
+  <div className="file-preview-box">
+    <iframe
+      src={aadhaarUrl}
+      title="Aadhaar Preview"
+      className="aadhaar-preview"
+    ></iframe>
+  </div>
+) : (
+  <FileUpload
+    id="aadhar"
+    className="register-s3-u"
+    required
+    onFileChange={(file) => handleFileChange(file, setAadharCard, true)} // Aadhaar validation
+  />
+)}
 
-                
-              </div>
-            )}
+      {/* NOC Upload */}
+      <label className="flabel">Upload NOC Letter:</label>
+      <FileUpload
+        id="noc"
+        className="register-s3-u"
+        required
+        onFileChange={(file) => handleFileChange(file, setNocLetter)}
+      />
+    </div>
+
+    <div className="row1">
+      {/* Building Permission Upload */}
+      <label className="flabel">Upload Building Permission Letter:</label>
+      <FileUpload
+        id="buildingPermission"
+        className="register-s3-u"
+        required
+        onFileChange={(file) => handleFileChange(file, setBuildingPermission)}
+      />
+
+      {/* Place Picture Upload */}
+      <label className="flabel">Upload Picture of the Place:</label>
+      <FileUpload
+        id="placePicture"
+        className="register-s3-u"
+        required
+        onFileChange={(file) => handleFileChange(file, setPlacePicture)}
+      />
+    </div>
+  </div>
+)}
 
             {/* Step 3: Availability */}
             {currentStep === 4 && (
