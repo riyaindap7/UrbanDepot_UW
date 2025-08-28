@@ -153,7 +153,6 @@ const Login = () => {
             </button>
           </div>
 
-          {/* SIGN UP FORM */}
           <div className={`register-form ${isSignUp ? "active" : ""}`}>
             <div className="form-title"><span>SIGN UP</span></div>
             <form onSubmit={handleSignUp}>

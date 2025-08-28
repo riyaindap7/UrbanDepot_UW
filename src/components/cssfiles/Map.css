@@ -124,56 +124,162 @@
 }
 .map-search button:hover { background-color: #7a1a32; }
 
-
-/* Popup styles updated for responsiveness */
+/* ===== Popup Container ===== */
 .map-popup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 360px;
+  width: 380px;
   max-width: calc(100% - 32px);
-  display: flex;
-  flex-direction: column;
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 14px;
-  border: 1px solid #ccc;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-  z-index: 1001; /* make sure it’s above overlay */
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 18px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
   box-sizing: border-box;
-  overflow: hidden;
+  font-family: "Inter", system-ui, sans-serif;
   font-size: 0.95rem;
+  color: #333;
+  animation: popupFadeIn 0.25s ease;
 }
+
+/* ===== Overlay (Blurred Background) ===== */
 .map-popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  backdrop-filter: blur(6px); /* blur effect */
-  background-color: rgba(0, 0, 0, 0); /* optional dark tint */
-  z-index: 1000; /* below popup */
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: fadeIn 0.25s ease;
 }
 
+/* ===== Popup Content ===== */
 .map-popup-content {
-  flex: 1;
+  max-height: 65vh;
   overflow-y: auto;
   padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 transparent;
 }
-.reservation-item { margin-bottom: 6px; padding: 6px; background: #f6f4f4; border-radius: 6px; }
 
+/* Scrollbar (for Chrome/Edge/Safari) */
+.map-popup-content::-webkit-scrollbar {
+  width: 6px;
+}
+.map-popup-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 6px;
+}
 
-/* popup close button class (use this instead of hard-coded left:234px) */
+/* ===== Close Button ===== */
 .map-popup-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 22px;
+  right: -42px;
   border: none;
-  background: transparent;
-  font-size: 20px;
+  margin-top: 18px;
+  background: #fef2f2;
+  font-size: 18px;
   color: #e53935;
   cursor: pointer;
+  border-radius: 50%;
+  padding: 4px 8px;
+  transition: 0.2s;
+}
+.map-popup-close:hover {
+  background: #fee2e2;
+  transform: scale(1.1);
+}
+
+/* ===== Titles & Sections ===== */
+.map-popup h3 {
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #111827;
+}
+.map-popup p {
+  margin: 3px 0;
+  color: #4b5563;
+}
+.map-popup strong {
+  color: #111827;
+}
+
+/* ===== Reservation Item ===== */
+.reservation-item {
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* ===== Already Booked Section ===== */
+.already-booked {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0;
+  font-weight: 500;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+/* ===== Buttons ===== */
+.map-popup-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.map-popup-buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Primary (Proceed) */
+.map-popup-buttons .proceed {
+  background: #111827;
+  color: white;
+}
+.map-popup-buttons .proceed:hover {
+  background: #1f2937;
+}
+
+/* Secondary (Directions) */
+.map-popup-buttons .directions {
+  background: #ef4444;
+  color: white;
+}
+.map-popup-buttons .directions:hover {
+  background: #dc2626;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes popupFadeIn {
+  from { transform: translate(-50%, -55%) scale(0.95); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
 
