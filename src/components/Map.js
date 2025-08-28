@@ -472,6 +472,8 @@ useEffect(() => {
                     <li>No bookings available</li>
                 )}
             </ul>
+
+            
             <div
   className="map-popup-butt"
   style={{
