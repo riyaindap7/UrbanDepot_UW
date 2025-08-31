@@ -1,70 +1,125 @@
+/* Desktop Sidebar */
 .admin-sidebar {
     width: 250px;
     background-color: #111827;
     color: #ffffff;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     height: 100vh;
     padding-top: 1rem;
 }
-
 .sidebar-header {
     text-align: center;
     margin-bottom: 2rem;
     font-size: 1.5rem;
     font-weight: bold;
 }
-
+.sidebar-greeting {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+.avatar {
+    background-color: #7a1a32;
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-size: 20px;
+    margin-right: 10px;
+}
 .sidebar-menu {
     list-style: none;
     padding: 0;
     margin: 0;
     flex-grow: 1;
 }
-
 .sidebar-menu li {
     display: flex;
     align-items: center;
     padding: 1rem;
-    font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 .sidebar-menu li:hover,
 .sidebar-menu li.active {
     background-color: #374151;
 }
-
 .iconadmin {
-    margin-right: 0.5rem; /* Adjusted margin for smaller size */
-    font-size: 2rem; /* Reduced icon size */
+    margin-right: 0.5rem;
+    font-size: 1.5rem;
 }
 
-.sidebar-profile {
+/* Mobile Navbar */
+.admin-navbar {
     display: flex;
+    justify-content: space-between;
     align-items: center;
+    background-color: #000000;
+    color: white;
     padding: 1rem;
-    border-top: 1px solid #374151;
+    position: relative;
 }
-
-.profile-pic {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 1rem;
+.navbar-left {
+    display: flex;
+    flex-direction: column;
 }
-
-.profile-info {
-    color: #9CA3AF;
+.welcome-text {
+    font-size: 14px;
+    color: #ccc;
 }
-
-.profile-info p {
+.hamburger {
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+.mobile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #1f2937;
+    width: 200px;
+    list-style: none;
+    padding: 0;
     margin: 0;
-    font-weight: bold;
+    border: 1px solid #374151;
+    z-index: 1000;
+}
+.mobile-dropdown li {
+    padding: 1rem;
+    border-bottom: 1px solid #000000;
+    cursor: pointer;
+}
+.mobile-dropdown li:hover {
+    background-color: #374151;
 }
 
-.profile-info small {
-    font-size: 0.9rem;
+/* Responsive behavior */
+.desktop-only {
+    display: block;
+}
+.mobile-only {
+    display: none;
+}
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+    .mobile-only {
+        display: flex;
+    }
+}
+
+.admin-sidebar.desktop-only {
+  width: 250px;
+  background-color: #000000;
+  flex-shrink: 0;
+  position: fixed;      /* Keep it fixed */
+  top: 0;
+  left: 0;
+  height: 100vh;        /* Full height sidebar */
+  overflow-y: auto;     /* Sidebar scrolls only if its content exceeds */
 }

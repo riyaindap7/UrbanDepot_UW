@@ -1,9 +1,8 @@
 
 .admin-page {
-    padding: 20px;
-    overflow: hidden;
+    /* padding: 20px; */
+    /* overflow-x: hidden; */
 }
-
 
 .tabs {
     display: flex;
@@ -79,11 +78,7 @@
     overflow: hidden;
 }
 
-.main-content {
-    flex: 1;
-    padding: 1.7rem;
-    overflow-y: auto;
-}
+
 
 .tabs {
     display: flex;
@@ -126,20 +121,10 @@
     border-radius: 4px;
 }
 
-/* .loading-indicator {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #888;
-} */
-.admin-page {
-    display: flex;
-    height: 100vh;
-}
-
 .main-content {
     padding: 10px;
     flex-grow: 1;
-    overflow-y: auto;
+    /* overflow: hidden; */
 }
 
 .statistics-overview {
@@ -181,7 +166,9 @@
     border-radius: 5px;
     margin-bottom: 15px;
 }
-
+.verifypagediv{
+    overflow-x: hidden;
+}
 /* Place Cards Styling */
 .place-card {
     border: 1px solid #ccc;
@@ -310,19 +297,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px 15px;
-    margin-bottom: 10px;
+    /* padding: 12px 16px; */
+    gap: 1rem;
     width: 100%;
-    box-sizing: border-box;
 }
 
-/* Styling for Verified and Non-Verified Cards */
-.verified-card {
-    background-color: #e8f5e9;
-    border-left: 4px solid #69d149;
-}
 
 .non-verified-card {
     background-color: #ffebee;
@@ -360,3 +339,97 @@
 
 
 
+
+
+/* Sidebar fixed on desktop */
+.admin-sidebar.desktop-only {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+/* Main content next to sidebar */
+.main-content {
+  flex-grow: 1;
+  margin-left: 270px;   /* Leave space for fixed sidebar */
+  padding: 20px;
+  /* height: 100vh;        */
+  overflow-y: auto;     /* Main content scrolls independently */
+  background-color: #f4f4f9;
+}
+.place-actions {
+  display: flex;
+  flex-direction: column; /* stack vertically */
+  align-items: center;    /* center them horizontally */
+  gap: 8px;               /* space between delete + button */
+}
+
+.delete-icon {
+  font-size: 18px;
+}
+
+/* 📱 Mobile + Small Screens */
+@media (max-width: 768px) {
+  .admin-page {
+    flex-direction: column; /* Stack vertically */
+    height: auto; /* Let content grow naturally */
+  }
+
+  /* Hide sidebar, show mobile navbar */
+  .admin-sidebar.desktop-only {
+    display: none;
+  }
+  .admin-navbar.mobile-only {
+    display: flex; /* already styled in AdminSidebar.css */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  /* Main content takes full width under navbar */
+  .main-content {
+    /* width: 100%; */
+    padding: 15px;
+    margin-left: 0px; 
+  }
+
+  /* Tabs become evenly spaced buttons */
+  .tabs {
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .tab-button {
+    flex: 1 1 auto;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  /* Place cards stack in single column */
+  .place-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .place-card {
+    /* flex-direction: column;
+    align-items: flex-start; */
+    text-align: left;
+    width: 100%;
+  }
+
+  .place-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .place-info span {
+    margin-right: 0;
+  }
+
+  .verify-button {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
