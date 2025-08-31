@@ -197,13 +197,17 @@ const Login = () => {
             <div className="form-title"><span>LOGIN</span></div>
             <form onSubmit={handleLogin}>
               <div className="form-inputs">
-                <div className="input-field">
-                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <div className="input-box">
+                
+                  <input className="input-field" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                   <i className="bx bx-envelope icon"></i>
+                
                 </div>
-                <div className="input-field">
-                  <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                  <i className="bx bx-lock-alt icon"></i>
+                <div className="input-box">
+                  
+                    <input className="input-field" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <i className="bx bx-lock-alt icon"></i>
+                  
                 </div>
                 <button className="input-submit" type="submit">
                   <span>LOG IN</span>

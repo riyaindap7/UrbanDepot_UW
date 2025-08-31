@@ -77,7 +77,7 @@ const AdminPage = () => {
 
       <main className="main-content">
         {activeTab === "registered" && (
-          <div>
+          <div className="verifypagediv">
             <div className="notification-banner">
               {activeSubTab === "verified" && <p>Displaying all verified places</p>}
               {activeSubTab === "nonVerified" && <p>Displaying places pending verification</p>}
@@ -130,17 +130,19 @@ const AdminPage = () => {
                         <span> Availability: {place.availability?.from} - {place.availability?.to}</span>
                         <span> Verified: No</span>
                       </div>
+                    <div className="place-actions">
+                      <FaTrash
+                        className="delete-icon"
+                        onClick={() => handleDeletePlace(place.id)}
+                        style={{ color: "red", cursor: "pointer" }}
+                      />
                       <button
                         className="verify-button"
                         onClick={() => handleVerifyPlace(place.id)}
                       >
                         Verify
                       </button>
-                      <FaTrash
-                        className="delete-icon"
-                        onClick={() => handleDeletePlace(place.id)}
-                        style={{ color: "red", cursor: "pointer" }}
-                      />
+                    </div>
                     </div>
                   ))}
               </div>
