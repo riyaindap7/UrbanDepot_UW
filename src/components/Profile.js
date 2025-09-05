@@ -39,7 +39,7 @@ const [demoExitTime, setDemoExitTime] = useState(null);
     }, [navigate]);
 
     useEffect(() => {
-  fetch("http://localhost:5000/api/run-demo")
+  fetch("http://localhost:8080/api/run-demo")
     .then((res) => res.json())
     .then((data) => {
       console.log("✅ API Response:", data);
@@ -412,7 +412,7 @@ const [demoExitTime, setDemoExitTime] = useState(null);
                     </div>
                 )}
 
-                <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} closeOnClick draggable pauseOnHover />
+                <ToastContainer position="top-right" autoClose={8080} hideProgressBar={false} closeOnClick draggable pauseOnHover />
             </div>
         </div>
     );
