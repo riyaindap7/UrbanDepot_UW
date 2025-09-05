@@ -139,7 +139,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d '{}' \
-            https://api.render.com/v1/services/${{ secrets.FRONTEND_SERVICE }}/deploys
+            https://api.render.com/v1/services/${{ secrets.FRONTEND_SERVICE_ID }}/deploys
     
       - name: Deploy Backend to Render
         run: |
@@ -148,4 +148,4 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d '{}' \
-            https://api.render.com/v1/services/${{ secrets.BACKEND_SERVICE }}/deploys
+            https://api.render.com/v1/services/${{ secrets.BACKEND_SERVICE_ID }}/deploys
