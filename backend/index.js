@@ -4,7 +4,16 @@ const bodyParser = require("body-parser")
 const admin = require("firebase-admin")
 const multer = require("multer")
 const { v4: uuidv4 } = require("uuid")
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON)
+let serviceAccount = null
+try {
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON environment variable is not set")
+  }
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON)
+} catch (err) {
+  console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON:", err.message)
+  process.exit(1)
+}
 const path = require("path")
 const Razorpay = require("razorpay")
 const crypto = require("crypto")
