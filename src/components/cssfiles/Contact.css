@@ -32,7 +32,7 @@ header p {
 
 .detail {
     flex: 1;
-    background-color: #e9f5ff; /* Light blue background */
+    background-color: #ffebee; /* Light red background */
     border-radius: 20px;
     padding: 20px;
     margin: 0 10px;
@@ -52,7 +52,7 @@ header p {
 }
 
 .location-icon {
-    color: #5bc0de; /* Soft blue for location */
+    color: #7a1a32; /* Red for location */
 }
 
 .phone-icon {

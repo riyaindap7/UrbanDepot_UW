@@ -327,7 +327,7 @@
 
 /* Direction steps list */
 .direction-step { display:flex; gap:12px; padding:10px 6px; border-bottom: 1px solid #e9e1e1; }
-.direction-icon { font-size: 18px; color: #4285f4; }
+.direction-icon { font-size: 18px; color: #7a1a32; }
 .direction-details { display:flex; flex-direction:column; }
 .instruction { font-size: 0.95rem; color: #333; }
 .distance { font-size: 0.85rem; color: #666; }

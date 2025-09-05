@@ -64,7 +64,7 @@ header p {
 }
 
 .faq-search:focus {
-    border-color: #007BFF; /* Highlight border color on focus */
+    border-color: #7a1a32; /* Red border color on focus */
     outline: none; /* Remove default outline */
 }
 
@@ -130,7 +130,7 @@ footer a {
 
 footer a:hover {
     text-decoration: underline;
-    color: #0056b3; /* Darker shade on hover */
+    color: #5a1326; /* Darker red shade on hover */
 }
 
 /* Add a transition effect for the footer links */

@@ -1,0 +1,139 @@
+.metric-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.metric-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-color);
+}
+
+.metric-card-blue {
+  --accent-color: #7a1a32;
+}
+
+.metric-card-green {
+  --accent-color: #10b981;
+}
+
+.metric-card-yellow {
+  --accent-color: #f59e0b;
+}
+
+.metric-card-red {
+  --accent-color: #fd0000;
+}
+
+.metric-card-purple {
+  --accent-color: #e91e63;
+}
+
+.metric-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+
+.metric-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metric-card-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.metric-card-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.metric-card-trend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.trend-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.trend-up {
+  color: #10b981;
+}
+
+.trend-down {
+  color: #ef4444;
+}
+
+.trend-neutral {
+  color: #6b7280;
+}
+
+.trend-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .metric-card {
+    padding: 20px;
+  }
+
+  .metric-card-value {
+    font-size: 28px;
+  }
+
+  .metric-card-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
