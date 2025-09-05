@@ -4,7 +4,7 @@ const bodyParser = require("body-parser")
 const admin = require("firebase-admin")
 const multer = require("multer")
 const { v4: uuidv4 } = require("uuid")
-const serviceAccount = require("./serviceAccountKey.json")
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON)
 const path = require("path")
 const Razorpay = require("razorpay")
 const crypto = require("crypto")
@@ -28,7 +28,7 @@ app.use("/api", demoRoutes)
 // Firebase Admin Init
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "urbandepot-cbda0.appspot.com", // replace this with your actual bucket
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "urbandepot-cbda0.appspot.com",
 })
 
 const db = admin.firestore()
