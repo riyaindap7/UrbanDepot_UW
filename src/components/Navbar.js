@@ -52,18 +52,24 @@ const Navbar = ({ userEmail }) => {
           </div>
           {dropdownOpen && (
   <div className="urban-dropdown-menu">
-    <Link to="/profile" onClick={handleLinkClick}>
-      <i className="fas fa-user" style={{ color: 'white', marginRight: '12px' }}></i> Profile
-    </Link>
-    <Link to="/contact" onClick={handleLinkClick}>
-      <i className="fas fa-envelope" style={{ color: 'white', marginRight: '12px' }}></i> Contact
-    </Link>
-    <Link to="/faq" onClick={handleLinkClick}>
-      <i className="fas fa-question-circle" style={{ color: 'white', marginRight: '12px' }}></i> FAQ
-    </Link>
-    <button className="urban-navbar-logout-btn" onClick={handleLogout}>
-      <i className="fas fa-sign-out-alt" style={{ color: 'white', marginRight: '12px' }}></i> Logout
-    </button>
+          <Link to="/profile" onClick={handleLinkClick}>
+            <i className="fas fa-user" style={{ color: 'white', marginRight: '12px' }}></i> Profile
+          </Link>
+          <Link to="/owner-dashboard" onClick={handleLinkClick}>
+            <i className="fas fa-tachometer-alt" style={{ color: 'white', marginRight: '12px' }}></i> Owner Dashboard
+          </Link>
+          <Link to="/user-dashboard" onClick={handleLinkClick}>
+            <i className="fas fa-tachometer-alt" style={{ color: 'white', marginRight: '12px' }}></i> User Dashboard
+          </Link>
+          <Link to="/contact" onClick={handleLinkClick}>
+            <i className="fas fa-envelope" style={{ color: 'white', marginRight: '12px' }}></i> Contact
+          </Link>
+          <Link to="/faq" onClick={handleLinkClick}>
+            <i className="fas fa-question-circle" style={{ color: 'white', marginRight: '12px' }}></i> FAQ
+          </Link>
+          <button className="urban-navbar-logout-btn" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt" style={{ color: 'white', marginRight: '12px' }}></i> Logout
+          </button>
   </div>
 )}
 </div>
