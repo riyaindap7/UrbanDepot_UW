@@ -1,10 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { FaTrash } from 'react-icons/fa';
 
-import AdminSidebar from "./AdminSidebar";
-import "./AdminPage.css";
-import Forpay from "./ForPay";
-import Loading from "./Loading";
+"use client"
+
+import { useEffect, useState } from "react"
+import { FaTrash, FaUsers, FaChartLine, FaDollarSign, FaMapMarkerAlt } from "react-icons/fa"
+
+import AdminSidebar from "./AdminSidebar"
+import "./cssfiles/AdminPage.css"
+import Forpay from "./ForPay"
+import Loading from "./Loading"
+import LineChart from "./LineChart"
+import BarChart from "./BarChart"
+import PieChart from "./PieChart"
+import DashboardCard from "./DashboardCard"
+import MetricCard from "./MetricCard"
 
 const AdminPage = () => {
   const [places, setPlaces] = useState([])
@@ -12,33 +20,76 @@ const AdminPage = () => {
   const [activeSubTab, setActiveSubTab] = useState("verified")
   const [loading, setLoading] = useState(true)
 
+  const [dashboardData, setDashboardData] = useState({
+    userActivity: [],
+    bookingTrends: [],
+    revenueInsights: null,
+    occupancyPatterns: [],
+    loading: false,
+    error: null,
+  })
+
   // Fetch places from backend
   const fetchPlaces = async () => {
     setLoading(true)
     try {
-      const response = await fetch("http://localhost:5000/api/places");
-      const data = await response.json();
-      setPlaces(data);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/places`)
+      const data = await response.json()
+      setPlaces(data)
     } catch (error) {
       console.error("Error fetching places:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
+
+  const fetchDashboardData = async () => {
+    setDashboardData((prev) => ({ ...prev, loading: true, error: null }))
+
+    try {
+      const [userActivityRes, bookingTrendsRes, revenueInsightsRes, occupancyPatternsRes] = await Promise.all([
+        fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/user-activity`),
+        fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/booking-trends?period=daily&days=30`),
+        fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/revenue-insights`),
+        fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/occupancy-patterns`),
+      ])
+
+      const [userActivity, bookingTrends, revenueInsights, occupancyPatterns] = await Promise.all([
+        userActivityRes.json(),
+        bookingTrendsRes.json(),
+        revenueInsightsRes.json(),
+        occupancyPatternsRes.json(),
+      ])
+
+      setDashboardData({
+        userActivity,
+        bookingTrends,
+        revenueInsights,
+        occupancyPatterns,
+        loading: false,
+        error: null,
+      })
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error)
+      setDashboardData((prev) => ({
+        ...prev,
+        loading: false,
+        error: "Failed to load dashboard data",
+      }))
+    }
+  }
 
   const handleVerifyPlace = async (placeId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/verify/${placeId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/verify/${placeId}`, {
         method: "POST",
-      });
+      })
 
       if (response.ok) {
         // Refetch data or update locally
-        setPlaces(prev =>
-          prev.map(p => (p.id === placeId ? { ...p, verified: true } : p))
-        );
+        setPlaces((prev) => prev.map((p) => (p.id === placeId ? { ...p, verified: true } : p)))
       } else {
-        console.error("Failed to verify place");
+        console.error("Failed to verify place")
       }
     } catch (error) {
       console.error("Error verifying place:", error)
@@ -48,15 +99,15 @@ const AdminPage = () => {
   const handleDeletePlace = async (placeId) => {
     if (window.confirm("Are you sure you want to delete this place?")) {
       try {
-        const response = await fetch(`http://localhost:5000/api/places/${placeId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/places/${placeId}`, {
           method: "DELETE",
-        });
+        })
 
         if (response.ok) {
-          setPlaces((prev) => prev.filter((p) => p.id !== placeId));
-          alert("Place deleted successfully");
+          setPlaces((prev) => prev.filter((p) => p.id !== placeId))
+          alert("Place deleted successfully")
         } else {
-          console.error("Failed to delete place");
+          console.error("Failed to delete place")
         }
       } catch (error) {
         console.error("Error deleting place:", error)
@@ -65,11 +116,67 @@ const AdminPage = () => {
   }
 
   useEffect(() => {
-    fetchPlaces();
-  }, []);
+    fetchPlaces()
+  }, [])
 
-  const verifiedPlaces = places.filter((place) => place.verified);
-  const nonVerifiedPlaces = places.filter((place) => !place.verified);
+  useEffect(() => {
+    if (activeTab === "statistics") {
+      fetchDashboardData()
+    }
+  }, [activeTab])
+
+  const verifiedPlaces = places.filter((place) => place.verified)
+  const nonVerifiedPlaces = places.filter((place) => !place.verified)
+
+  const formatBookingTrendsData = () => {
+    if (!dashboardData.bookingTrends.length) return { labels: [], values: [] }
+
+    return {
+      labels: dashboardData.bookingTrends.map((item) =>
+        new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      ),
+      values: dashboardData.bookingTrends.map((item) => item.count),
+      label: "Daily Bookings",
+    }
+  }
+
+  const formatRevenueByVehicleData = () => {
+    if (!dashboardData.revenueInsights?.revenueByVehicleType) return { labels: [], values: [] }
+
+    const vehicleData = dashboardData.revenueInsights.revenueByVehicleType
+    return {
+      labels: Object.keys(vehicleData).map((key) => key.charAt(0).toUpperCase() + key.slice(1)),
+      values: Object.values(vehicleData).map((item) => Number.parseFloat(item.revenue)),
+      label: "Revenue by Vehicle Type",
+    }
+  }
+
+  const formatOccupancyData = () => {
+    if (!dashboardData.occupancyPatterns.length) return { labels: [], values: [] }
+
+    const topPlaces = dashboardData.occupancyPatterns.slice(0, 8)
+    return {
+      labels: topPlaces.map((place) => place.placeName || place.placeId),
+      values: topPlaces.map((place) => place.occupancyRate),
+      label: "Occupancy Rate (%)",
+    }
+  }
+
+  const formatUserActivityData = () => {
+    if (!dashboardData.userActivity.length) return { labels: [], datasets: [] }
+
+    const topUsers = dashboardData.userActivity.slice(0, 10)
+    return {
+      labels: topUsers.map((user) => user.email.split("@")[0]),
+      datasets: [
+        {
+          label: "Bookings Count",
+          data: topUsers.map((user) => user.bookingsCount),
+          backgroundColor: "#7a1a32",
+        },
+      ],
+    }
+  }
 
   return (
     <div className="admin-page">
@@ -199,10 +306,8 @@ const AdminPage = () => {
         )}
 
         {activeTab === "registered" && (
-          <div>
+          <div className="verifypagediv">
             <div className="notification-banner">
-              {activeSubTab === "verified" && <p>Displaying all verified places</p>}
-              {activeSubTab === "nonVerified" && <p>Displaying places pending verification</p>}
               {activeSubTab === "verified" && <p>Displaying all verified places</p>}
               {activeSubTab === "nonVerified" && <p>Displaying places pending verification</p>}
             </div>
@@ -230,17 +335,17 @@ const AdminPage = () => {
                   verifiedPlaces.map((place) => (
                     <div key={place.id} className="place-card verified-card">
                       <div className="place-info">
-                        <span><b>{place.placeName || "Unknown Place"}</b></span>
+                        <span>
+                          <b>{place.placeName || "Unknown Place"}</b>
+                        </span>
                         <span> Address: {place.address}</span>
                         <span> Charge: {place.charge}</span>
-                        <span> Availability: {place.availability?.from} - {place.availability?.to}</span>
+                        <span>
+                          {" "}
+                          Availability: {place.availability?.from} - {place.availability?.to}
+                        </span>
                         <span> Verified: Yes</span>
                       </div>
-                      <FaTrash
-                        className="delete-icon"
-                        onClick={() => handleDeletePlace(place.id)}
-                        style={{ color: "red", cursor: "pointer" }}
-                      />
                       <FaTrash
                         className="delete-icon"
                         onClick={() => handleDeletePlace(place.id)}
@@ -253,10 +358,15 @@ const AdminPage = () => {
                   nonVerifiedPlaces.map((place) => (
                     <div key={place.id} className="place-card non-verified-card">
                       <div className="place-info">
-                        <span><b>{place.placeName || "Unknown Place"}</b></span>
+                        <span>
+                          <b>{place.placeName || "Unknown Place"}</b>
+                        </span>
                         <span> Address: {place.address}</span>
                         <span> Charge: {place.charge}</span>
-                        <span> Availability: {place.availability?.from} - {place.availability?.to}</span>
+                        <span>
+                          {" "}
+                          Availability: {place.availability?.from} - {place.availability?.to}
+                        </span>
                         <span> Verified: No</span>
                       </div>
                     <div className="place-actions">
@@ -271,11 +381,7 @@ const AdminPage = () => {
                       >
                         Verify
                       </button>
-                      <FaTrash
-                        className="delete-icon"
-                        onClick={() => handleDeletePlace(place.id)}
-                        style={{ color: "red", cursor: "pointer" }}
-                      />
+                    </div>
                     </div>
                   ))}
               </div>
