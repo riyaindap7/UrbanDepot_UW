@@ -346,7 +346,8 @@ setSearchMarkers(prevMarkers => [...prevMarkers, marker]);
     const [isMapShrunk, setIsMapShrunk] = useState(false); //for shrinking the map on get-direction event
 
     const proceedToBook = (place) => {
-        const query = `?lat=${place.lat}&lng=${place.lng}&id=${encodeURIComponent(place.id)}&charge=${place.charge}&address=${encodeURIComponent(place.address)}`;
+        const charge = place.charge || place.chargeAvailability || "30"; // Fallback to default charge
+        const query = `?lat=${place.lat}&lng=${place.lng}&id=${encodeURIComponent(place.id)}&charge=${charge}&address=${encodeURIComponent(place.address)}`;
         window.location.href = `/reservation${query}`;
     };
  
