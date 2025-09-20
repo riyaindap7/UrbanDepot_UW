@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import './Ticket.css';
-import ticketImage from './images/ticket.png';
+import './cssfiles/Ticket.css';
+
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import emailjs from 'emailjs-com';
@@ -88,7 +88,8 @@ const Ticket = () => {
     <div className="ticket-wrapper">
       <div
         className="ticket-container"
-        style={{ backgroundImage: `url(${ticketImage})` }}
+        style={{ backgroundImage: `url("/ticket.png")` }}
+
         id="ticket-container"
       >
         <div className="left-section">

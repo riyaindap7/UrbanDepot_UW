@@ -50,6 +50,17 @@ const Availability = ({ placeId }) => {
   };
   fetchData();
 }, [placeId]);
+  const fetchData = async () => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/availability/${placeId}`);
+      const data = await res.json();
+      setAvailableTimes(data.availableSlots || []);
+    } catch (err) {
+      setError("Failed to fetch data.");
+    }
+  };
+  fetchData();
+}, [placeId]);
   // Helper function to format time
   const formatTime = (date) => {
     return date.toTimeString().slice(0, 5); // Format to HH:MM

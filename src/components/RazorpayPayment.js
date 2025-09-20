@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import db from '../firebaseConfig';
-import './RazorpayPayment.css';
+import './cssfiles/RazorpayPayment.css';
 import emailjs from 'emailjs-com';
 import Loading from './Loading';
 
@@ -89,58 +89,74 @@ const RazorpayPayment = () => {
   setLoading(true);
 
   try {
-    const orderRes = await fetch('http://localhost:5000/api/create-order', {
+    // Convert to paise (integer)
+    const amountInPaise = Math.round(parseFloat(totalAmount) * 100);
+
+    const orderRes = await fetch(`${process.env.REACT_APP_API_URL}/api/create-order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: totalAmount })
+      body: JSON.stringify({ amount: amountInPaise })  // 👈 Send in paise
     });
 
     const order = await orderRes.json();
-    
+
     const options = {
-      key: razorpayApiKey,
-      amount: order.amount,
-      currency: order.currency,
-      name: "UrbanDepot",
-      description: "Parking Reservation Payment",
-      order_id: order.id,
-      handler: async function (response) {
-        // Verify the payment
-        const verifyRes = await fetch('http://localhost:5000/api/verify-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(response)
-        });
+        key: razorpayApiKey,
+        amount: amountInPaise,
+        currency: order.currency,
+        name: "UrbanDepot",
+        description: "Parking Reservation Payment",
+        order_id: order.id,
+        handler: async function (response) {
+          console.log("Payment Response:", response);
 
-        const verifyData = await verifyRes.json();
+          try {
+            // ✅ Step 3: Verify payment in backend
+            const verifyRes = await fetch(`${process.env.REACT_APP_API_URL}/api/verify-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
 
-        if (verifyData.verified) {
-          await sendEmailToOwner(response.razorpay_payment_id);
-          setLoading(false);
+            const verifyData = await verifyRes.json();
 
-          navigate('/ticket', {
-            state: {
-              paymentId: response.razorpay_payment_id,
-              address,
-              place,
-              reservationData,
-              totalAmount
+            if (verifyData.verified) {
+              console.log("✅ Payment verified successfully");
+              await sendEmailToOwner(response.razorpay_payment_id);
+
+              setLoading(false);
+              navigate("/ticket", {
+                state: {
+                  paymentId: response.razorpay_payment_id,
+                  address,
+                  place,
+                  reservationData,
+                  totalAmount, // in ₹
+                },
+              });
+            } else {
+              console.error("❌ Payment verification failed");
+              setLoading(false);
+              alert("Payment verification failed");
             }
-          });
-        } else {
-          setLoading(false);
-          alert('Payment verification failed');
-        }
-      },
-      prefill: {
-        name,
-        email,
-        contact: contactNumber,
-      },
-      theme: {
-        color: "#F37254"
-      }
-    };
+          } catch (err) {
+            console.error("Verification error:", err);
+            setLoading(false);
+          }
+        },
+        prefill: {
+          name,
+          email,
+          contact: contactNumber,
+        },
+        theme: {
+          color: "#F37254",
+        },
+      };
 
     const rzp = new window.Razorpay(options);
     rzp.open();
@@ -151,6 +167,7 @@ const RazorpayPayment = () => {
     setLoading(false);
   }
 };
+
 
   const sendEmailToOwner = async (paymentId) => {
     console.log("Entered emailing function");

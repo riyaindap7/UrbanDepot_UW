@@ -1,0 +1,416 @@
+/* Container: use flex layout so map + panel can sit side-by-side on desktop and stack on mobile */
+.firstmap {
+  /* margin-top:10px; */
+  background-color: #fff;
+  margin: 0;
+  padding: 10px 12px 65px;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+
+/* Map - responsive width, centered, rounded */
+.map {
+  flex: 1 1 70%;            /* take available space but allow shrink */
+  max-width: 1200px;        /* cap width on very large screens */
+  min-width: 280px;
+  height: 80vh;             /* desktop height */
+  border-radius: 25px;
+  transition: all 0.28s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+
+/* When directions panel is shown, shrink map height a bit */
+.map.shrunk {
+  min-height: 40vh;
+  height: 50vh;
+}
+
+
+/* Search Container - moved from absolute to normal flow for responsive layout */
+.map-search {
+  width: 360px;
+  max-width: 40%;
+  box-sizing: border-box;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  /* z-index: 5; */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+/* Headings & labels */
+.map-search h5 {
+  font-size: 1.1rem; /* use rem instead of large vh */
+  margin: 0;
+  font-weight: 700;
+}
+.map-search p {
+  font-size: 0.95rem;
+  color: #676a68;
+}
+.map-search label {
+  padding-left: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+
+/* Input blocks */
+.park-search-div,
+.map-row-2,
+.date,
+.time {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+
+/* specialized smaller radii for date/time rows */
+.date, .time { border-radius: 8px; padding: 8px 12px; }
+
+
+/* Divider becomes a vertical border on desktop, hidden on mobile */
+.divider {
+  width: 1px;
+  background: #e6e6e6;
+  align-self: stretch;
+  height: 40px;
+}
+
+
+/* Inputs and selects */
+.map-search input,
+.map-search select {
+  border: none;
+  outline: none;
+  color: #676a68;
+  /* font-size: 0.95rem; */
+  padding: 6px 6px;
+  width: 100%;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+
+/* Button styles */
+.map-search button {
+  padding: 10px 12px;
+  border-radius: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 15px;
+  border: none;
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+.map-search button:hover { background-color: #7a1a32; }
+
+/* ===== Popup Container ===== */
+.map-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  max-width: calc(100% - 32px);
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 18px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  box-sizing: border-box;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.95rem;
+  color: #333;
+  animation: popupFadeIn 0.25s ease;
+}
+
+/* ===== Overlay (Blurred Background) ===== */
+.map-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: fadeIn 0.25s ease;
+}
+
+/* ===== Popup Content ===== */
+.map-popup-content {
+  max-height: 65vh;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 transparent;
+}
+
+/* Scrollbar (for Chrome/Edge/Safari) */
+.map-popup-content::-webkit-scrollbar {
+  width: 6px;
+}
+.map-popup-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 6px;
+}
+
+/* ===== Close Button ===== */
+.map-popup-close {
+  position: absolute;
+  top: 22px;
+  right: -42px;
+  border: none;
+  margin-top: 18px;
+  background: #fef2f2;
+  font-size: 18px;
+  color: #e53935;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 4px 8px;
+  transition: 0.2s;
+}
+.map-popup-close:hover {
+  background: #fee2e2;
+  transform: scale(1.1);
+}
+
+/* ===== Titles & Sections ===== */
+.map-popup h3 {
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #111827;
+}
+.map-popup p {
+  margin: 3px 0;
+  color: #4b5563;
+}
+.map-popup strong {
+  color: #111827;
+}
+
+/* ===== Reservation Item ===== */
+.reservation-item {
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* ===== Already Booked Section ===== */
+.already-booked {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0;
+  font-weight: 500;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+/* ===== Buttons ===== */
+.map-popup-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.map-popup-buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Primary (Proceed) */
+.map-popup-buttons .proceed {
+  background: #111827;
+  color: white;
+}
+.map-popup-buttons .proceed:hover {
+  background: #1f2937;
+}
+
+/* Secondary (Directions) */
+.map-popup-buttons .directions {
+  background: #ef4444;
+  color: white;
+}
+.map-popup-buttons .directions:hover {
+  background: #dc2626;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes popupFadeIn {
+  from { transform: translate(-50%, -55%) scale(0.95); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+
+/* popup action buttons */
+.map-popup-butt { display: flex; gap: 8px; margin-top: 10px; }
+.map-popup-btn { flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; font-weight: 600; }
+.map-popup-btn.primary { background: #000; color: #ffd700; border-color: #bbb; }
+.map-popup-btn.danger  { background: #ff4d4d; color: #fff; }
+
+
+/* Scrollbar cosmetic */
+.map-popup::-webkit-scrollbar { width: 8px; }
+.map-popup::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+.map-popup::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+
+
+/* Directions panel — move to right/top and be responsive */
+.directions-box-directions {
+  position: absolute;
+  right: 48px;
+  top: 1vh;
+  width: 360px;
+  max-width: 90%;
+  height: 75vh;
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #fff;
+  z-index: 70;
+  box-sizing: border-box;
+}
+.directions-box-directions .dir_panel-exit-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+
+/* Direction steps list */
+.direction-step { display:flex; gap:12px; padding:10px 6px; border-bottom: 1px solid #e9e1e1; }
+.direction-icon { font-size: 18px; color: #7a1a32; }
+.direction-details { display:flex; flex-direction:column; }
+.instruction { font-size: 0.95rem; color: #333; }
+.distance { font-size: 0.85rem; color: #666; }
+
+
+/* ------------------- Responsive breakpoints ------------------- */
+/* Medium screens: slightly reduce sizes */
+@media (max-width: 1024px) {
+  .map { height: 65vh; }
+  .map-search { width: 340px; max-width: 36%; }
+  .map-popup { width: 320px; right: 12px; }
+  .directions-box-directions { width: 320px; height: 60vh; top: 5vh; right: 12px; }
+}
+
+
+/* Mobile: stack, full width controls, bottom sheet popup */
+@media (max-width: 1024px) {
+  .firstmap { flex-direction: column; padding: 10px; gap: 12px; top:0px; }
+  .map { order: 1; width: 100%; height: 50vh; min-height: 300px; border-radius: 12px; }
+  .map-search { order: 2; width: 100%; max-width: 100%; padding: 12px; border-radius: 12px; }
+  .park-search-div, .map-row-2, .date, .time { flex-direction: column; align-items: stretch; padding: 10px; }
+  .divider { display: none; }
+
+
+  /* popup becomes bottom-sheet */
+.map-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  margin: 0;
+  border-radius: 12px;
+  padding: 16px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 1000;
+}
+.map-popup-content {
+  max-height: none;
+  overflow: hidden;
+}
+
+.map-popup-butt {
+  flex-direction: column;
+}
+
+.map-popup-btn {
+  width: 100%;
+}
+
+
+  /* directions expand full width bottom modal */
+  .directions-box-directions {
+  position: fixed;
+  left: 20px;
+  right: 0;
+  bottom: 0;
+  top: 437px;
+  width: 1050px;
+  max-height: 34vh;
+  border-radius: 12px 12px 12px 12px;
+  overflow-y: auto;
+  padding: 22px;
+  border-color: #000;
+  }
+}
+.map-popup,
+.map-popup-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+

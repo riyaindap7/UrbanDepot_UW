@@ -5,11 +5,14 @@ import { doc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../firebaseConfig';
 import Tesseract from 'tesseract.js'; // Import Tesseract.js
-import './ReservationForm.css';
+import './cssfiles/ReservationForm.css';
 import { FaCar, FaMotorcycle, FaTruck, FaBicycle } from "react-icons/fa";
 import ProgressBar from './ProgressBar';
 import FileUpload from './FileUpload'; // Adjust the path according to your project structure
 import Loading from './Loading'; // Import the Loading component
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 
 const generateTimeOptions = () => {
@@ -136,60 +139,138 @@ const ReservationForm = () => {
 };
 
 
+
   // Function to run OCR
-  const runOCR = async (file) => {
-    try {
-      const { data: { text } } = await Tesseract.recognize(file, 'eng', {
-        logger: (m) => console.log(m),
-      });
+  // Function to run OCR
+const runOCR = async (file) => {
+  try {
+    const { data: { text } } = await Tesseract.recognize(file, 'eng', {
+      logger: (m) => console.log("[Tesseract Log]", m),
+    });
 
-      setOcrText(text); // Set the OCR text to state
+    console.log("=== RAW OCR TEXT START ===");
+    console.log(text);
+    console.log("=== RAW OCR TEXT END ===");
 
-      const nameMatch = text.match(/name\s*:\s*([a-zA-Z\s]+)/i);
-      if (nameMatch && nameMatch[1]) {
-        const extractedName = nameMatch[1].trim();
-        setFormData((prevData) => ({
-          ...prevData,
-          extractedName: extractedName
-        }));
-      } else {
-        setLicenseValidationMessage('Name not found on the license. Please ensure the photo is clear and properly scanned.');
+    setOcrText(text);
+
+    // Try regex for "Name: xyz" first
+    let nameMatch = text.match(/name\s*[:\-]?\s*([a-zA-Z\s]+)/i);
+
+    // If not found, fallback: pick the line that looks like a name
+    if (!nameMatch) {
+      const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+      console.log("OCR Lines:", lines);
+
+      // Look for a line with 2–4 words, mostly alphabets, before DOB
+      const possibleNameLine = lines.find(line =>
+        /^[A-Za-z\s]+$/.test(line) && line.split(" ").length >= 2 && !line.toLowerCase().includes("dob")
+      );
+
+      if (possibleNameLine) {
+        console.log("Detected name line:", possibleNameLine);
+        nameMatch = [, possibleNameLine]; // mimic regex match
       }
-    } catch (error) {
-      console.error('OCR Error:', error);
-      setLicenseValidationMessage('Error during OCR processing. Please try again.');
     }
-  };
 
-  const validateLicense = () => {
-    const nameMatch = ocrText.match(/name\s*:\s*([a-zA-Z\s]+)/i);
-    const normalizedExtractedName = nameMatch && nameMatch[1]
-      ? nameMatch[1].replace(/\s+/g, ' ').trim().toUpperCase() // Normalize extracted name
-      : '';
+    if (nameMatch && nameMatch[1]) {
+      const extractedName = nameMatch[1].trim();
+      console.log("Extracted Name (before cleaning):", extractedName);
 
-    const normalizedUserName = formData.name
-      .replace(/\s+/g, ' ') // Replace multiple spaces with a single space
-      .trim() // Remove leading/trailing whitespace
-      .toUpperCase(); // Convert to uppercase
-
-    // Clean names to remove non-ASCII characters
-    const cleanedExtractedName = normalizedExtractedName.replace(/[^\x20-\x7E]/g, '');
-    const cleanedUserName = normalizedUserName.replace(/[^\x20-\x7E]/g, '');
-
-    console.log("Extracted Name:", cleanedExtractedName);
-    console.log("User Name:", cleanedUserName);
-
-    // Compare while allowing for trailing characters
-    const namesMatch = cleanedExtractedName.startsWith(cleanedUserName);
-
-    if (!namesMatch) {
-        console.error("Names do not match:", cleanedExtractedName, "!==", cleanedUserName);
+      setFormData((prevData) => ({
+        ...prevData,
+        extractedName: extractedName,
+      }));
     } else {
-        console.log("Names match!");
+      setLicenseValidationMessage("⚠️ Could not detect name from license. Please try again.");
     }
+  } catch (error) {
+    console.error("OCR Error:", error);
+    setLicenseValidationMessage("Error during OCR processing. Please try again.");
+  }
+};
+
+const validateLicense = () => {
+  console.log("=== RAW OCR TEXT START ===");
+  console.log(ocrText);
+  console.log("=== RAW OCR TEXT END ===");
+
+  // Split OCR text into clean lines
+  const lines = ocrText
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+
+  console.log("OCR Lines:", lines);
+
+  let extractedName = "";
+
+  // Step 1: Try regex "Name" pattern
+  const nameMatch = ocrText.match(/name\s*[:\-]?\s*([a-zA-Z\s]+)/i);
+  if (nameMatch && nameMatch[1]) {
+    extractedName = nameMatch[1].trim();
+    console.log("Detected name via regex:", extractedName);
+  }
+
+  // Step 2: If regex fails, try DOB-based detection
+  if (!extractedName) {
+    const dobIndex = lines.findIndex((line) =>
+      line.toLowerCase().includes("dob")
+    );
+
+    if (dobIndex > 0) {
+      // Look up to 3 lines above DOB
+      for (let i = 1; i <= 3; i++) {
+        const candidate = lines[dobIndex - i];
+        if (
+          candidate &&
+          /^[A-Za-z\s]+$/.test(candidate) && // only alphabets & spaces
+          candidate.split(" ").length >= 2   // at least two words
+        ) {
+          extractedName = candidate;
+          console.log("Detected name line:", extractedName);
+          break;
+        }
+      }
+    }
+  }
+
+  // Step 3: Normalize names
+  const normalizedExtractedName = extractedName
+    ? extractedName.replace(/\s+/g, " ").trim().toUpperCase()
+    : "";
+
+  console.log("Extracted Name (normalized):", normalizedExtractedName);
+
+  const normalizedUserName = formData.name
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+
+  console.log("User Name (normalized):", normalizedUserName);
+
+  // Step 4: Clean non-ASCII characters
+  const cleanedExtractedName = normalizedExtractedName.replace(
+    /[^\x20-\x7E]/g,
+    ""
+  );
+  const cleanedUserName = normalizedUserName.replace(/[^\x20-\x7E]/g, "");
+
+  console.log("Extracted Name (cleaned):", cleanedExtractedName);
+  console.log("User Name (cleaned):", cleanedUserName);
+
+  // Step 5: Compare names
+  const namesMatch = cleanedExtractedName.includes(cleanedUserName);
+
+  if (!namesMatch) {
+    console.error("❌ Names do not match:", cleanedExtractedName, "!=", cleanedUserName);
+  } else {
+    console.log("✅ Names match!");
+  }
 
     return namesMatch;
   };
+
 
   const isValidLicense = (text) => {
     const keywords = [
@@ -206,43 +287,112 @@ const ReservationForm = () => {
     return regex.test(text);
   };
 
-  const handleNextStep = () => {
-    setStep((prevStep) => prevStep + 1);
+const scrollToTop = () => {
+  // Detect the scrolling element
+  const scrollingEl =
+    document.scrollingElement || document.documentElement || document.body;
+
+  // If your step is inside a specific container with overflow
+  const stepContainer = document.querySelector(".steps-wrapper, .reserve-step");
+  
+  if (stepContainer && stepContainer.scrollHeight > stepContainer.clientHeight) {
+    // Scroll the container
+    stepContainer.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    // Scroll the whole page
+    scrollingEl.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
+const handleNextStep = () => {
+  if (validateStep()) {
+    setStep((prevStep) => {
+      const newStep = prevStep + 1;
+
+      // Scroll after step is updated/rendered
+      setTimeout(scrollToTop, 0);
+
+      return newStep;
+    });
+  } else {
+    toast.error("Please fill in all required fields before proceeding.");
+  }
+};
+  const validateStep = () => {
+    switch (step) {
+      case 1:
+        return formData.name && formData.email && formData.contactNumber;
+      case 2:
+        return formData.checkinDate && formData.checkoutDate && formData.checkinTime && formData.checkoutTime;
+      case 3:
+        return formData.vehicleType && formData.licensePlate;
+      case 4:
+        return formData.licensePhoto && formData.platePhoto;
+      case 5:
+        return true; // Always allow to proceed to final review
+      default:
+        return false;
+    }
   };
 
-  const handlePrevStep = () => {
-    setStep((prevStep) => prevStep - 1);
-  };
+const handlePrevStep = () => {
+  setStep((prevStep) => {
+    const newStep = prevStep - 1;
+
+    // Scroll after step is updated/rendered
+    setTimeout(scrollToTop, 0);
+
+    return newStep;
+  });
+};
+
 
   const handleSubmit = async (e) => {
   e.preventDefault();
 
-  // Clear previous error messages
   setErrorMessage('');
   setLicenseValidationMessage('');
   setIsLoading(true);
 
-  // Validate the license name against the user's name
+  // ✅ Step 1: Validate license
   if (!validateLicense()) {
-    setLicenseValidationMessage('The name on the license does not match the provided name. Please upload a valid license.');
+    setLicenseValidationMessage(
+      'The name on the license does not match the provided name. Please upload a valid license.'
+    );
     setIsLoading(false);
     return;
   }
 
   try {
-    const formDataToSend = new FormData();
+    // ✅ Step 2: Check if slot is already booked
+    const availabilityCheck = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/bookings/checkAvailability`, // <-- make sure matches backend
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          place: formData.place,
+          checkin: `${formData.checkinDate}T${formData.checkinTime}`,
+          checkout: `${formData.checkoutDate}T${formData.checkoutTime}`,
+        }),
+      }
+    );
 
-    // Append files
+    const availabilityResult = await availabilityCheck.json();
+
+    if (!availabilityCheck.ok || !availabilityResult.available) {
+      toast.error('❌ This slot is already booked. Please choose another.');
+      setIsLoading(false);
+      return;
+    }
+
+    // ✅ Step 3: If available, continue with reservation submission
+    const formDataToSend = new FormData();
     formDataToSend.append('licensePhoto', formData.licensePhoto);
     formDataToSend.append('platePhoto', formData.platePhoto);
+    formDataToSend.append('data', JSON.stringify(formData));
 
-    // Append the rest of the data as a JSON string
-    const data = {
-      ...formData,
-    };
-    formDataToSend.append('data', JSON.stringify(data));
-
-    const response = await fetch('http://localhost:5000/api/reserve', {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reserve`, {
       method: 'POST',
       body: formDataToSend,
     });
@@ -250,11 +400,11 @@ const ReservationForm = () => {
     const result = await response.json();
 
     if (!response.ok) {
-      setErrorMessage(result.error || 'Reservation failed');
+      toast.error(result.error || 'Reservation failed');
+      setIsLoading(false);
       return;
     }
 
-    // Navigate to payment page with reservation data
     navigate('/payment', {
       state: {
         address: formData.address,
@@ -264,16 +414,14 @@ const ReservationForm = () => {
     });
   } catch (error) {
     console.error('Error submitting reservation:', error);
-    setErrorMessage('An error occurred while submitting your reservation. Please try again.');
+    toast.error("This slot is already booked. Please choose another one.");
   } finally {
     setIsLoading(false);
   }
 };
 
+{isLoading && <Loading />}  // Overlay spinner, but don't unmount form
 
-  if (isLoading) {
-    return <Loading />; // Show loading component
-  }
 
   const renderStep = () => {
     {errorMessage && <div className="error-message">{errorMessage}</div>} {/* Error message display */}
@@ -350,7 +498,7 @@ const ReservationForm = () => {
               <p id='reserve-step2-sidetext2'>Let us know when you’ll be arriving and departing so we can reserve the space just for you.</p>
             </div>
             <div className="reserve-step2-form">
-            <h2>Reservation Dates</h2>
+            <p><strong>Reservation Dates</strong></p>
             <div className='reserve-step2-date'>
             <div className='reserve-step2-checkin-date'>
             <label>Check-in Date:</label>
@@ -481,13 +629,14 @@ const ReservationForm = () => {
         case 4:
           return (
               <div className="reserve-step4">
-                  <div className="reserve-step3-sidetext">
+                  <div className="reserve-step4-sidetext">
                       <p id='step'>Step 4</p>
-                      <p id='reserve-step3-sidetext1'>Verify with Photos</p>
-                      <p id='reserve-step3-sidetext2'>Please upload your license and plate photos. This ensures everything is set for a smooth visit!</p>
+                      <p id='reserve-step4-sidetext1'>Verify with Photos</p>
+                      <p id='reserve-step4-sidetext2'>Please upload your license and plate photos. This ensures everything is set for a smooth visit!</p>
                   </div>
                   <div className='reserve-step4-form'>
-                  <h2 class="upload-photos-title">Upload Photos</h2>
+                  <p class="upload-photos-title">Upload Photos</p>
+                  <div className="upload-con">
                   <div className="reserve-step4-file-upload-container">
                           <FileUpload 
                               onFileChange={(file) => handleFileChange(file, 'licensePhoto')} // Triggering file change for license photo
@@ -504,9 +653,11 @@ const ReservationForm = () => {
                               id="platePhoto"
                           />
                       </div>
-                      <p>{errorMessage}</p> {/* Displaying error message if necessary */}
+                    </div>
                   </div>
-              </div>
+                </div>
+                 
+              
           );
       
         
@@ -573,6 +724,7 @@ const ReservationForm = () => {
   
   return (
     <div className="reserve-page">
+      <ToastContainer /> {/* <-- Add this line */}
       {errorMessage && <div className="error-message">{errorMessage}</div>}
       <ProgressBar
         currentStep={step}

@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import './Map.css';
+import './cssfiles/Map.css';
 import FetchLatLng from './FetchLatLng';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { db } from '../firebaseConfig';
+import { collection, onSnapshot } from "firebase/firestore";
+
 import { Navigate } from "react-router-dom"; // Import Navigate from react-router-dom
 const mapsApiKey = process.env.REACT_APP_MAPS_API_KEY;
 const Map = () => {
@@ -48,6 +53,10 @@ const Map = () => {
         setSearchMarkers([]);
 
         places.forEach(place => {
+            if (typeof place.lat !== "number" || typeof place.lng !== "number") {
+                console.warn("Invalid lat/lng for place:", place);
+                return; // Skip this marker
+              }
             const marker = new window.google.maps.Marker({
                 position: { lat: place.lat, lng: place.lng },
                 map: mapInstance,
@@ -148,10 +157,11 @@ const Map = () => {
     }, []);
 
     useEffect(() => {
-        if (mapInstance && places.length > 0) {
-            addMarkersForPlaces(places); // Highlighted change
-        }
-    }, [mapInstance, places]);
+  if (mapInstance && places.length > 0) {
+    addMarkersForPlaces(places);
+  }
+}, [mapInstance, places]);
+
 
 
     const addMarkersForFetchedPlaces = (fetchedPlaces) => {
@@ -279,7 +289,7 @@ const Map = () => {
                 setPopupVisible(true);
             });
     
-            setSearchMarkers(prevMarkers => [...prevMarkers, marker]);
+setSearchMarkers(prevMarkers => [...prevMarkers, marker]);
         });
     
         if (searchLocation) {
@@ -323,7 +333,7 @@ const Map = () => {
             ));
             setDirectionsSteps(steps);
             setPopupVisible(false); //closing the popup
-            setIsMapShrunk(true); //shrinking the map on get-diretion event
+            setIsMapShrunk(false); //shrinking the map on get-diretion event
             setDirectionsVisible(true);
 
         } else {
@@ -347,8 +357,41 @@ const Map = () => {
         }
     }
 
+useEffect(() => {
+  const unsubscribe = onSnapshot(collection(db, "places"), (snapshot) => {
+    setPlaces((prevPlaces) => {
+      let updated = [...prevPlaces];
+
+      snapshot.docChanges().forEach((change) => {
+        const data = { id: change.doc.id, ...change.doc.data(), 
+          lat: change.doc.data().landmark?.lat,
+          lng: change.doc.data().landmark?.lng
+        };
+
+        if (change.type === "added") {
+          updated.push(data);
+        }
+        if (change.type === "modified") {
+          updated = updated.map((p) => (p.id === data.id ? data : p));
+        }
+        if (change.type === "removed") {
+          updated = updated.filter((p) => p.id !== data.id);
+        }
+      });
+
+      return updated;
+    });
+  });
+
+  return () => unsubscribe();
+}, []);
+
+
     return (
-        <div style={{ position: "relative" }}>
+        <div >
+        <div style={{ position: "relative" }} className="firstmap">
+        <ToastContainer />
+
         <div className={`map ${isMapShrunk ? 'shrunk' : ''}`} ref={mapRef}></div>
         <div className="map-search">
         <h5>Find your perfect parking spot on UrbanDepot </h5>
@@ -405,6 +448,8 @@ const Map = () => {
        
             {/* Popup for displaying selected place details */}
             {popupVisible && (
+                <>
+                <div className="map-popup-overlay" onClick={() => { resetMap(); setPopupVisible(false); }}></div>
                 <div className="map-popup">
                     <div className="map-popup-content">
                     <h3>Place: {selectedPlace.id}</h3>
@@ -427,6 +472,8 @@ const Map = () => {
                     <li>No bookings available</li>
                 )}
             </ul>
+
+            
             <div
   className="map-popup-butt"
   style={{
@@ -480,32 +527,33 @@ const Map = () => {
 </button>
 
 <button
-                            onClick={() => { resetMap(); setPopupVisible(false); }}
-                            style={{
-                                position: 'absolute',
-                                top: '-8px',         // Adjust to desired spacing from the top
-                                left: '234px',        // Adjust to desired spacing from the left
-                                border: 'none',
-                                backgroundColor: 'transparent', // Make the background transparent
-                                color: 'red',      // Set text color to red
-                                fontSize: '24px',    // Increase font size for better visibility
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                zIndex: 1000,        // Ensure the button is above other elements
-                            }}
-                        >
-                            ✖
-                        </button>
+className="map-popup-close"
+    onClick={() => { resetMap(); setPopupVisible(false); }}
+    style={{
+        position: 'absolute',
+        top: '-8px',         // Adjust to desired spacing from the top
+        left: '234px',        // Adjust to desired spacing from the left
+        border: 'none',
+        backgroundColor: 'transparent', // Make the background transparent
+        color: 'red',      // Set text color to red
+        fontSize: '24px',    // Increase font size for better visibility
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        zIndex: 1000,        // Ensure the button is above other elements
+    }}
+>
+     ✖
+    </button>
 
 </div>
 
-                </div>
-                </div>
+    </div>
+        </div></>
             )}
             {directionsSteps.length > 0 && (
             <div className="direction-box">
             <div className={`directions-box-directions ${directionsVisible ? "show":""}`}>
-            <button className="dir_panel-exit-button" onClick={() => {
+<button className="dir_panel-exit-button" onClick={() => {
     if (directionsRenderer) {
         directionsRenderer.setMap(null); // Clear directions from the map
     }
@@ -515,7 +563,6 @@ const Map = () => {
 }}>
     Close
 </button>
-
                 <h4>Directions:</h4>
                 <ul id="direction-list">{directionsSteps}</ul>
             </div></div>
@@ -523,6 +570,7 @@ const Map = () => {
 
         <FetchLatLng onFetchPlaces={onFetchPlaces} />
        </div> 
+       </div>
     );
 };
 

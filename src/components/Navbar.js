@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { auth } from "../firebaseConfig";
-import './Navbar.css';
+import './cssfiles/Navbar.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import urbanLogo from './images/urbanlogo1.png';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -35,37 +35,46 @@ const Navbar = ({ userEmail }) => {
   return (
     <nav className="urban-navbar">
       <div className="urban-navbar-logo">
-        <img src={urbanLogo} alt="Urban Depot Logo" className="urban-logo" />
-        <h1 className="urban-navbar-title"><strong>URBANDEPOT</strong></h1>
+        {/* Wrap the logo in Link to make it clickable */}
+        <Link to="/map">
+          <img src="/urbanlogo1.png" alt="Urban Depot Logo" className="urban-logo" />
+        </Link>
+        <h1 className="urban-navbar-title">urbandepot</h1>
       </div>
       <div className="urban-navbar-links">
         <Link to="/map" className="no-hover" onClick={handleLinkClick}>
           <i className="fas fa-home"></i> 
         </Link>
-        <Link to="/register-place" onClick={handleLinkClick}>LIST YOUR SPACE</Link>
+        <Link to="/register-place" onClick={handleLinkClick}>List Your Space</Link>
         <div className="urban-navbar-dropdown">
           <div className="urban-hamburger-icon" onClick={toggleDropdown}>
             <i className="fas fa-bars"></i>
           </div>
           {dropdownOpen && (
   <div className="urban-dropdown-menu">
-    <Link to="/profile" onClick={handleLinkClick}>
-      <i className="fas fa-user" style={{ color: 'white', marginRight: '12px' }}></i> Profile
-    </Link>
-    <Link to="/contact" onClick={handleLinkClick}>
-      <i className="fas fa-envelope" style={{ color: 'white', marginRight: '12px' }}></i> Contact
-    </Link>
-    <Link to="/faq" onClick={handleLinkClick}>
-      <i className="fas fa-question-circle" style={{ color: 'white', marginRight: '12px' }}></i> FAQ
-    </Link>
-    <button className="urban-navbar-logout-btn" onClick={handleLogout}>
-      <i className="fas fa-sign-out-alt" style={{ color: 'white', marginRight: '12px' }}></i> Logout
-    </button>
+          <Link to="/profile" onClick={handleLinkClick}>
+            <i className="fas fa-user" style={{ color: 'white', marginRight: '12px' }}></i> Profile
+          </Link>
+          <Link to="/owner-dashboard" onClick={handleLinkClick}>
+            <i className="fas fa-tachometer-alt" style={{ color: 'white', marginRight: '12px' }}></i> Owner Dashboard
+          </Link>
+          <Link to="/user-dashboard" onClick={handleLinkClick}>
+            <i className="fas fa-tachometer-alt" style={{ color: 'white', marginRight: '12px' }}></i> User Dashboard
+          </Link>
+          <Link to="/contact" onClick={handleLinkClick}>
+            <i className="fas fa-envelope" style={{ color: 'white', marginRight: '12px' }}></i> Contact
+          </Link>
+          <Link to="/faq" onClick={handleLinkClick}>
+            <i className="fas fa-question-circle" style={{ color: 'white', marginRight: '12px' }}></i> FAQ
+          </Link>
+          <button className="urban-navbar-logout-btn" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt" style={{ color: 'white', marginRight: '12px' }}></i> Logout
+          </button>
   </div>
 )}
-
-        </div>
-      </div>
+</div>
+</div>
+      {/* renders the email */}
       {userEmail && (
         <div className="urban-navbar-user-info">
           <span className="urban-navbar-user-email">{userEmail}</span>

@@ -12,8 +12,11 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import './Login.css';
+import styles from './cssfiles/Login.css';
 import 'boxicons/css/boxicons.min.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -56,7 +59,7 @@ const Login = () => {
       console.log("✅ ID Token:", token);
 
       // Test protected route
-      const response = await fetch("http://localhost:5000/api/protected", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/protected`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`
@@ -109,7 +112,7 @@ const Login = () => {
       console.log("✅ Google Login Token:", token);
 
       // Optional: send to backend
-      const response = await fetch("http://localhost:5000/api/protected", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/protected`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`
@@ -128,12 +131,16 @@ const Login = () => {
   };
 
   return (
-    
+    <div className="login-page" style={{
+    backgroundImage: `url("/grey3.jpg")`}}>
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
+
       <div className={`form-container ${isSignUp ? "show-signup" : "show-login"}`}>
         <div className="col col-1">
-          
-            <img src="car.png" className="car-bg" alt="Car" />
-          
+          <div className="image-layer" >
+            <img src="car.png" className="car-bg" />
+            
+          </div>
           <p className="words">Few Seconds Away From Solving Parking Issue!</p>
         </div>
         <div className="col col-2">
@@ -146,23 +153,33 @@ const Login = () => {
             </button>
           </div>
 
-          {/* SIGN UP FORM */}
           <div className={`register-form ${isSignUp ? "active" : ""}`}>
             <div className="form-title"><span>SIGN UP</span></div>
             <form onSubmit={handleSignUp}>
               <div className="form-inputs">
                 <div className="input-box">
-                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  <input
+                    className="input-field"
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                   <i className="bx bx-envelope icon"></i>
                 </div>
                 <div className="input-box">
-                  <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                  <input
+                    className="input-field"
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
                   <i className="bx bx-lock-alt icon"></i>
                 </div>
-                <div className="input-box">
-                  <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-                  <i className="bx bx-lock-alt icon"></i>
-                </div>
+                
                 <button className="input-submit" type="submit">
                   <span>Sign Up</span>
                   <i className="bx bx-right-arrow-alt"></i>
@@ -181,12 +198,16 @@ const Login = () => {
             <form onSubmit={handleLogin}>
               <div className="form-inputs">
                 <div className="input-box">
-                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                
+                  <input className="input-field" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                   <i className="bx bx-envelope icon"></i>
+                
                 </div>
                 <div className="input-box">
-                  <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                  <i className="bx bx-lock-alt icon"></i>
+                  
+                    <input className="input-field" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <i className="bx bx-lock-alt icon"></i>
+                  
                 </div>
                 <button className="input-submit" type="submit">
                   <span>LOG IN</span>
@@ -201,8 +222,10 @@ const Login = () => {
           </div>
         </div>
       </div>
-    
+    </div>
   );
+
 };
+
 
 export default Login;

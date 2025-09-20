@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LandingPage.css';
+import './cssfiles/LandingPage.css';
 import Typed from 'typed.js';
 
 const LandingPage = () => {
@@ -27,7 +27,7 @@ const LandingPage = () => {
   const handleKeyDown = useCallback((event) => {
     if (event.key === 'Enter') {
       setFadeOut(true);
-      setTimeout(() => navigate('/home'), 1200); // Match this timeout to the animation duration
+      setTimeout(() => navigate('/home1'), 1200); // Match this timeout to the animation duration
     }
   }, [navigate]);
 

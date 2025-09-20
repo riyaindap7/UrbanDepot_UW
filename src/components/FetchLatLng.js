@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import './FetchLatLng.css';
-import Loading from './Loading';
+import db from '../firebaseConfig'; // Import your Firebase Firestore config
+import './cssfiles/FetchLatLng.css'; // Import your CSS file
+import Loading from './Loading'; // Import the new Loading component
+
+
 
 const FetchLatLng = ({ onFetchPlaces }) => {
   const [loading, setLoading] = useState(true);
@@ -10,7 +13,7 @@ const FetchLatLng = ({ onFetchPlaces }) => {
     const fetchPlaces = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:5000/api/fetch-places");
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/fetch-places`);
         const data = await res.json();
         onFetchPlaces(data);
       } catch (err) {
