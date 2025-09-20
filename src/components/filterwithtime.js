@@ -90,7 +90,7 @@ const Map = () => {
 
                 setSelectedPlace({
                     address: place.formatted_address,
-                    chargeAvailability: place.charge,
+                    charge: place.charge,
                     availabilityFrom: place.availability_from,
                     availabilityTo: place.availability_to,
                     name: place.name,
@@ -112,7 +112,7 @@ const Map = () => {
                 marker.addListener("click", () => {
                     const reservationDetails = place.reservations || [];
                     setSelectedPlace({
-                        chargeAvailability: place.charge,
+                        charge: place.charge,
                         availabilityFrom: place.availability.from,
                         availabilityTo: place.availability.to,
                         address: place.address,
@@ -146,7 +146,7 @@ const Map = () => {
                 const destination = {
                     lat: place.geometry.location.lat(),
                     lng: place.geometry.location.lng(),
-                    chargeAvailability: place.charge,
+                    charge: place.charge,
                     address: place.formatted_address,
                     availabilityFrom: place.availability.from,
                     availabilityTo: place.availability.to,
@@ -207,7 +207,8 @@ const Map = () => {
     };
 
     const proceedToBook = (place) => {
-        const query = `?lat=${place.lat}&lng=${place.lng}&name=${encodeURIComponent(place.name)}&charge=${place.chargeAvailability}&id=${selectedPlace.id}&address=${place.address}`;
+        const charge = place.charge || place.chargeAvailability || "30"; // Fallback to default charge
+        const query = `?lat=${place.lat}&lng=${place.lng}&id=${encodeURIComponent(place.id)}&charge=${charge}&address=${encodeURIComponent(place.address)}`;
         window.location.href = `/reservation${query}`;
     };
 
