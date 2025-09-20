@@ -139,7 +139,6 @@ const ReservationForm = () => {
 };
 
 
-
   // Function to run OCR
   // Function to run OCR
 const runOCR = async (file) => {
@@ -268,8 +267,8 @@ const validateLicense = () => {
     console.log("✅ Names match!");
   }
 
-    return namesMatch;
-  };
+  return namesMatch;
+};
 
 
   const isValidLicense = (text) => {
