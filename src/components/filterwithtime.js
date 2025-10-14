@@ -3,12 +3,14 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { FaDirections } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // Add useNavigate import
 import './cssfiles/Map.css';
 import FetchLatLng from './FetchLatLng';
 
 const mapsApiKey = process.env.REACT_APP_MAPS_API_KEY;
 
 const Map = () => {
+    const navigate = useNavigate(); // Add useNavigate hook
     const [places, setPlaces] = useState([]);
     const mapRef = useRef(null);
     const [searchMarker, setSearchMarker] = useState(null);
@@ -208,7 +210,7 @@ const Map = () => {
 
     const proceedToBook = (place) => {
         const query = `?lat=${place.lat}&lng=${place.lng}&name=${encodeURIComponent(place.name)}&charge=${place.chargeAvailability}&id=${selectedPlace.id}&address=${place.address}`;
-        window.location.href = `/reservation${query}`;
+        navigate(`/reservation${query}`);
     };
 
     const getDirections = () => {
