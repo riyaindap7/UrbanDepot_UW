@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: urban-depot-frontend
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: ./build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /200.html
