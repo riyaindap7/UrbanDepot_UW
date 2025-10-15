@@ -29,7 +29,9 @@ const Login = () => {
   const location = useLocation();
   
   // Get the page user was trying to access before being redirected to login
-  const from = location.state?.from?.pathname + (location.state?.from?.search || '') || "/map";
+  const from = location.state?.from 
+    ? location.state.from.pathname + (location.state.from.search || '') 
+    : "/map";
 
   // Admin credentials
   const adminEmail = "admin@gmail.com";
