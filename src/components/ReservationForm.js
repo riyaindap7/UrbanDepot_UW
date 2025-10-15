@@ -50,7 +50,22 @@ const ReservationForm = () => {
 
   const queryParams = new URLSearchParams(location.search);
   const addressFromURL = queryParams.get('address') || '';
-  const placeFromURL = queryParams.get('id') || '';
+  // Handle both old 'name' parameter and new 'id' parameter for backward compatibility
+  const placeFromURL = queryParams.get('id') || queryParams.get('name') || '';
+  
+  // Debug logging
+  console.log('🔍 ReservationForm Debug:', {
+    fullURL: location.search,
+    addressFromURL,
+    placeFromURL,
+    allParams: Object.fromEntries(queryParams.entries())
+  });
+
+  // If no place ID, show error
+  if (!placeFromURL) {
+    console.error('❌ No place ID found in URL parameters');
+  }
+  
   const [ocrText, setOcrText] = useState('');
   const [step, setStep] = useState(1); // Track the current step
   const [errorMessage, setErrorMessage] = useState(''); // State for error message

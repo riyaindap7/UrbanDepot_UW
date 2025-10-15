@@ -5,8 +5,6 @@ import db from '../firebaseConfig';
 import './cssfiles/RazorpayPayment.css';
 import emailjs from 'emailjs-com';
 import Loading from './Loading';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const razorpayApiKey = process.env.REACT_APP_RAZORPAY_API_KEY;
 
