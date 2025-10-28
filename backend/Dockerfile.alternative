@@ -11,38 +11,29 @@ CMD ["npm", "test"]
 # ---- Stage: runtime (production container) ----
 FROM node:18-alpine AS runtime
 
-# Install Python and OpenCV dependencies
+# Install Python and try to use system OpenCV packages
 RUN apk add --no-cache \
     python3 \
     py3-pip \
     py3-numpy \
-    python3-dev \
-    build-base \
-    linux-headers \
-    cmake \
-    pkgconfig \
-    jpeg-dev \
-    libpng-dev \
-    tiff-dev \
-    libwebp-dev \
-    openblas-dev \
+    py3-opencv \
     && ln -sf python3 /usr/bin/python
 
-# Create virtual environment and install Python packages
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# If py3-opencv is not available, fall back to pip installation
+RUN if ! python3 -c "import cv2" 2>/dev/null; then \
+        python3 -m venv /opt/venv && \
+        . /opt/venv/bin/activate && \
+        pip install --no-cache-dir opencv-python-headless numpy; \
+    fi
 
-# Install OpenCV for Python in virtual environment
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Ensure Python packages are accessible
+ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY . .
 
-# Ensure virtual environment is in PATH for runtime
-ENV PATH="/opt/venv/bin:$PATH"
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
