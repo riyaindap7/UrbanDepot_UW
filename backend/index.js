@@ -880,41 +880,43 @@ app.get("/api/dashboard/owner/:email", async (req, res) => {
   try {
     const { email } = req.params
 
-    // Get owner's registered places
-    const placesSnapshot = await db.collection("users").doc(email).collection("register").get()
+    // Get owner's registered places from the main places collection directly
+    const placesSnapshot = await db.collection("places").where("ownerEmail", "==", email).get()
     const ownerPlaces = placesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
 
     let totalRevenue = 0
     let totalBookings = 0
     const placeMetrics = []
 
+    // Process each place individually
     for (const place of ownerPlaces) {
-      // Find corresponding place in main places collection
-      const mainPlaceSnapshot = await db.collection("places").where("userEmail", "==", email).get()
+      const reservationsSnapshot = await db.collection("places").doc(place.id).collection("reservations").get()
 
-      for (const mainPlaceDoc of mainPlaceSnapshot.docs) {
-        const reservationsSnapshot = await db.collection("places").doc(mainPlaceDoc.id).collection("reservations").get()
+      // placeTotalAmount = sum of booking totals for this place
+      let placeTotalAmount = 0
+      const placeBookings = reservationsSnapshot.size
 
-        let placeRevenue = 0
-        const placeBookings = reservationsSnapshot.size
+      // Sum all reservation totals for this place
+      reservationsSnapshot.forEach((reservationDoc) => {
+        const reservation = reservationDoc.data()
+        const totalAmount = Number.parseFloat(reservation.total_amount || 0) || 0
+        placeTotalAmount += totalAmount
+      })
 
-        reservationsSnapshot.forEach((reservationDoc) => {
-          const reservation = reservationDoc.data()
-          const totalAmount = Number.parseFloat(reservation.total_amount || 0)
-          placeRevenue += totalAmount
-        })
+      // Owner earns 2% of the total bookings for their place
+      const ownerShare = placeTotalAmount * 0.02
 
-        totalRevenue += placeRevenue
-        totalBookings += placeBookings
+      totalRevenue += ownerShare
+      totalBookings += placeBookings
 
-        placeMetrics.push({
-          placeId: mainPlaceDoc.id,
-          placeName: place.placeName,
-          revenue: placeRevenue,
-          bookings: placeBookings,
-          verified: place.verified || false,
-        })
-      }
+      placeMetrics.push({
+        placeId: place.id,
+        placeName: place.placeName,
+        // report owner's share as revenue for this place
+        revenue: ownerShare.toFixed(2),
+        bookings: placeBookings,
+        verified: place.verified || false,
+      })
     }
 
     res.status(200).json({
