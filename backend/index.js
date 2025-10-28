@@ -537,7 +537,27 @@ app.post(
         return url
       }
 
-      const aadharUrl = await uploadFile(files.aashaarcard, files.aashaarcard[0].originalname)
+      // Handle Aadhar: use existing URL or upload new file
+      let aadharUrl;
+      if (data.existingAadhaarUrl) {
+        aadharUrl = data.existingAadhaarUrl;
+      } else if (files.aashaarcard && files.aashaarcard[0]) {
+        aadharUrl = await uploadFile(files.aashaarcard, files.aashaarcard[0].originalname);
+      } else {
+        return res.status(400).json({ error: "No Aadhar card provided" });
+      }
+
+      // Upload other required files
+      if (!files.nocLetter || !files.nocLetter[0]) {
+        return res.status(400).json({ error: "NOC Letter is required" });
+      }
+      if (!files.buildingPermission || !files.buildingPermission[0]) {
+        return res.status(400).json({ error: "Building Permission is required" });
+      }
+      if (!files.placePicture || !files.placePicture[0]) {
+        return res.status(400).json({ error: "Place Picture is required" });
+      }
+
       const nocUrl = await uploadFile(files.nocLetter, files.nocLetter[0].originalname)
       const buildingUrl = await uploadFile(files.buildingPermission, files.buildingPermission[0].originalname)
       const picUrl = await uploadFile(files.placePicture, files.placePicture[0].originalname)

@@ -334,7 +334,7 @@ const [demoExitTime, setDemoExitTime] = useState(null);
               <span className="value">{demoExitTime || "--"}</span>
             </div>
 <div className="detail-row">
-  <span className="label">Validation:</span>
+  {/* <span className="label">Validation:</span>
   <span
     className={`value ${
       checkDetectedValidity(booking, demoEntryTime, demoExitTime) === "Valid Parking"
@@ -343,7 +343,7 @@ const [demoExitTime, setDemoExitTime] = useState(null);
     }`}
   >
     {checkDetectedValidity(booking, demoEntryTime, demoExitTime)}
-  </span>
+  </span> */}
 </div>
 
 
