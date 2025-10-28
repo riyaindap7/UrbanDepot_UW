@@ -37,7 +37,7 @@ app.use("/api", demoRoutes)
 // Firebase Admin Init
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "urbandepot-cbda0.appspot.com",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "UrbanDepot-cbda0.appspot.com",
 })
 
 const db = admin.firestore()
@@ -757,11 +757,13 @@ app.get("/api/dashboard/booking-trends", async (req, res) => {
   }
 })
 
-// Get revenue insights - platform fees and totals aggregated
+// Get revenue insights - platform fees and totals aggregated (Admin gets 98% of total bookings)
 app.get("/api/dashboard/revenue-insights", async (req, res) => {
   try {
     const placesSnapshot = await db.collection("places").get()
-    let totalRevenue = 0
+    let totalBookingAmount = 0  // Total amount from all bookings
+    let platformRevenue = 0     // 98% of total bookings (admin's share)
+    let ownerRevenue = 0        // 2% of total bookings (owners' share)
     let totalBookings = 0
     const revenueByPlace = {}
     const revenueByVehicleType = {}
@@ -772,43 +774,52 @@ app.get("/api/dashboard/revenue-insights", async (req, res) => {
 
       const reservationsSnapshot = await db.collection("places").doc(placeId).collection("reservations").get()
 
-      let placeRevenue = 0
+      let placeBookingAmount = 0  // Total booking amount for this place
+      let placePlatformRevenue = 0 // Platform's 98% share from this place
       let placeBookings = 0
 
       reservationsSnapshot.forEach((reservationDoc) => {
         const reservation = reservationDoc.data()
-        const platformFee = Number.parseFloat(reservation.platform_fee || 0)
         const totalAmount = Number.parseFloat(reservation.total_amount || 0)
         const vehicleType = reservation.vehicleType || "unknown"
 
-        // Use total amount paid by user, not just platform fee
-        totalRevenue += totalAmount
-        placeRevenue += totalAmount
+        // Calculate platform (98%) and owner (2%) shares
+        const ownerShare = totalAmount * 0.02  // 2% to owner
+        const platformShare = totalAmount * 0.98  // 98% to platform
+
+        totalBookingAmount += totalAmount
+        platformRevenue += platformShare
+        ownerRevenue += ownerShare
+        placeBookingAmount += totalAmount
+        placePlatformRevenue += platformShare
         totalBookings += 1
         placeBookings += 1
 
-        // Revenue by vehicle type
+        // Revenue by vehicle type (showing platform's share)
         if (!revenueByVehicleType[vehicleType]) {
           revenueByVehicleType[vehicleType] = { revenue: 0, count: 0 }
         }
-        revenueByVehicleType[vehicleType].revenue += totalAmount
+        revenueByVehicleType[vehicleType].revenue += platformShare
         revenueByVehicleType[vehicleType].count += 1
       })
 
       if (placeBookings > 0) {
         revenueByPlace[placeId] = {
           placeName: placeData.placeName || placeId,
-          revenue: placeRevenue,
+          revenue: placePlatformRevenue.toFixed(2),  // Platform's share from this place
+          totalBookingAmount: placeBookingAmount.toFixed(2),  // Total booking amount
           bookings: placeBookings,
-          averageRevenue: placeRevenue / placeBookings,
+          averageRevenue: (placePlatformRevenue / placeBookings).toFixed(2),
         }
       }
     }
 
     res.status(200).json({
-      totalRevenue: totalRevenue.toFixed(2),
+      totalRevenue: platformRevenue.toFixed(2),  // Platform's 98% revenue
+      totalBookingAmount: totalBookingAmount.toFixed(2),  // Total amount from all bookings
+      ownerRevenue: ownerRevenue.toFixed(2),  // Total 2% paid to owners
       totalBookings,
-      averageRevenuePerBooking: totalBookings > 0 ? (totalRevenue / totalBookings).toFixed(2) : 0,
+      averageRevenuePerBooking: totalBookings > 0 ? (platformRevenue / totalBookings).toFixed(2) : 0,
       revenueByPlace,
       revenueByVehicleType,
     })

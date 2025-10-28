@@ -13,7 +13,7 @@ const Hero = () => {
           <div className="hero-text">
             <h1 className="hero-title">
               Let
-              <span className="highlight"> URBANDEPOT</span>
+              <span className="highlight"> UrbanDepot</span>
               <br />
               get you parked
             </h1>
@@ -61,7 +61,7 @@ const Hero = () => {
               <div className="phone-screen">
                 <div className="app-interface">
                   <div className="app-header">
-                    <div className="app-title">urbandepot</div>
+                    <div className="app-title">UrbanDepot</div>
                     <div className="location-pin"></div>
                   </div>
                   <div className="map-area">

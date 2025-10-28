@@ -108,7 +108,7 @@ const Ticket = () => {
         {/* QR Code positioned within ticket container for better separation */}
         <div className="qr-code">
           <QRCodeCanvas
-            value={`Thank you, ${reservationData.name}, for your reservation!\n\nPlace: ${place}\nAddress: ${address}\n\nVehicle: ${reservationData.vehicleType}\nCheck-in: ${reservationData.checkinDate} at ${reservationData.checkinTime}\nCheck-out: ${reservationData.checkoutDate} at ${reservationData.checkoutTime}\n\nPayment ID: ${paymentId}\nTotal: ₹${totalAmount}\n\nThank you for choosing URBANDEPOT!`}
+            value={`Thank you, ${reservationData.name}, for your reservation!\n\nPlace: ${place}\nAddress: ${address}\n\nVehicle: ${reservationData.vehicleType}\nCheck-in: ${reservationData.checkinDate} at ${reservationData.checkinTime}\nCheck-out: ${reservationData.checkoutDate} at ${reservationData.checkoutTime}\n\nPayment ID: ${paymentId}\nTotal: ₹${totalAmount}\n\nThank you for choosing UrbanDepot!`}
             size={160}
             level="H"
           />

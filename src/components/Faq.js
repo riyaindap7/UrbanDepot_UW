@@ -8,20 +8,20 @@ const FAQ = () => {
 
     const faqs = [ // Define faqs first
         {
-            question: "What is URBANDEPOT?",
-            answer: "URBANDEPOT is your one-stop solution for finding and booking parking spaces in urban areas. We connect you with nearby parking spots through our website, ensuring convenience and peace of mind."
+            question: "What is UrbanDepot?",
+            answer: "UrbanDepot is your one-stop solution for finding and booking parking spaces in urban areas. We connect you with nearby parking spots through our website, ensuring convenience and peace of mind."
         },
         {
-            question: "How does URBANDEPOT work?",
+            question: "How does UrbanDepot work?",
             answer: "Simply visit our website, search for available parking spaces near your location, and reserve your spot in advance. Our intuitive interface makes it easy to navigate and find the perfect parking space."
         },
         {
-            question: "Is there a fee for using URBANDEPOT?",
+            question: "Is there a fee for using UrbanDepot?",
             answer: "Yes, we utilize a platform fee structure: the fee is ₹30 per hour for cars and ₹15 per hour for bikes/scooters. This fee helps us maintain and improve our service for all users."
         },
         {
             question: "How can I contact customer support?",
-            answer: "If you need assistance, you can reach our customer support team via the 'Contact Us' section on our website or by emailing us at support@urbandepot.com. We're here to help!"
+            answer: "If you need assistance, you can reach our customer support team via the 'Contact Us' section on our website or by emailing us at support@UrbanDepot.com. We're here to help!"
         },
         {
             question: "Can I cancel my reservation?",
@@ -33,7 +33,7 @@ const FAQ = () => {
         },
         {
             question: "How can I provide feedback?",
-            answer: "We value your input! You can provide feedback directly through our website in the 'Feedback' section, or you can email us at feedback@urbandepot.com."
+            answer: "We value your input! You can provide feedback directly through our website in the 'Feedback' section, or you can email us at feedback@UrbanDepot.com."
         }
     ];
 

@@ -37,10 +37,10 @@ const Contact = () => {
                     <h2>Phone Number</h2>
                     <p>+1 8828174914</p>
                 </div>
-                <div className="detail" onClick={() => window.location.href = 'mailto:urbandepot2024@gmail.com'}>
+                <div className="detail" onClick={() => window.location.href = 'mailto:UrbanDepot2024@gmail.com'}>
                     <FaEnvelope className="icon email-icon" />
                     <h2>Email Us</h2>
-                    <p>urbandepot2024@gmail.com</p>
+                    <p>UrbanDepot2024@gmail.com</p>
                 </div>
             </div>
             <form onSubmit={handleSubmit} className="contact-form">
