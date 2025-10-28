@@ -21,12 +21,18 @@ router.get("/run-demo", (req, res) => {
     console.log(`stdout: ${line}`);
     logs += line;
 
-    // 🔎 detect entry/exit times directly from script output
-    if (line.includes("Car Entered")) {
-      entryTime = new Date().toLocaleString();
+    // 🔎 detect entry/exit times from actual script output
+    if (line.includes("Detected Entry Time:")) {
+      const match = line.match(/Detected Entry Time: (.+)/);
+      if (match) {
+        entryTime = match[1].trim();
+      }
     }
-    if (line.includes("Car Left")) {
-      exitTime = new Date().toLocaleString();
+    if (line.includes("Detected Exit Time:")) {
+      const match = line.match(/Detected Exit Time: (.+)/);
+      if (match) {
+        exitTime = match[1].trim();
+      }
     }
   });
 
@@ -39,11 +45,15 @@ router.get("/run-demo", (req, res) => {
     console.error(`Failed to start Python process: ${error.message}`);
     
     // Return a mock response when Python is not available
+    const now = new Date();
+    const mockEntryTime = new Date(now.getTime() - 30000); // 30 seconds ago
+    const mockExitTime = now;
+    
     res.json({
       error: "Python demo not available in this environment",
-      logs: `Demo simulation: Python environment not available.\nMock car entry at: ${new Date().toLocaleString()}\nMock car exit at: ${new Date(Date.now() + 30000).toLocaleString()}`,
-      entryTime: new Date().toLocaleString(),
-      exitTime: new Date(Date.now() + 30000).toLocaleString(),
+      logs: `Demo simulation: Python environment not available.\nMock car entry at: ${mockEntryTime.toISOString()}\nMock car exit at: ${mockExitTime.toISOString()}`,
+      entryTime: mockEntryTime.toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).replace('T', ' '),
+      exitTime: mockExitTime.toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).replace('T', ' '),
       isMockData: true
     });
   });
