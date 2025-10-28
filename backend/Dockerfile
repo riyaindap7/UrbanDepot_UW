@@ -10,6 +10,27 @@ CMD ["npm", "test"]
 
 # ---- Stage: runtime (production container) ----
 FROM node:18-alpine AS runtime
+
+# Install Python and OpenCV dependencies
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    python3-dev \
+    build-base \
+    linux-headers \
+    cmake \
+    pkgconfig \
+    jpeg-dev \
+    libpng-dev \
+    tiff-dev \
+    libwebp-dev \
+    openblas-dev \
+    && ln -sf python3 /usr/bin/python
+
+# Install OpenCV for Python
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
