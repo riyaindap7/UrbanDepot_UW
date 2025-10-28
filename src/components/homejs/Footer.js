@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="footer-content">
           <div className="footer-section">
             <div className="footer-logo">
-              <h3>UrbanDepot</h3>
+              <h3>urbandepot</h3>
               <p>
                 Smart parking solutions for modern cities. Find, book, and park with confidence.
               </p>
@@ -54,7 +54,7 @@ const Footer = () => {
           <div className="footer-section">
             <h4>Contact</h4>
             <ul>
-              <p>📧 hello@UrbanDepot.com</p>
+              <p>📧 hello@urbandepot.com</p>
               <p>📞 +1 (555) 123-4567</p>
               <p>📍 123 Tech Street, San Francisco, CA</p>
             </ul>
@@ -63,7 +63,7 @@ const Footer = () => {
 
         <div className="footer-bottom">
           <div className="footer-bottom-content">
-            <p>&copy; 2024 UrbanDepot. All rights reserved.</p>
+            <p>&copy; 2024 urbandepot. All rights reserved.</p>
             <div className="footer-links">
               <a href="#">Privacy</a>
               <a href="#">Terms</a>

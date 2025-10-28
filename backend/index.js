@@ -37,7 +37,7 @@ app.use("/api", demoRoutes)
 // Firebase Admin Init
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "UrbanDepot-cbda0.appspot.com",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "urbandepot-cbda0.appspot.com",
 })
 
 const db = admin.firestore()
@@ -537,27 +537,7 @@ app.post(
         return url
       }
 
-      // Handle Aadhar: use existing URL or upload new file
-      let aadharUrl;
-      if (data.existingAadhaarUrl) {
-        aadharUrl = data.existingAadhaarUrl;
-      } else if (files.aashaarcard && files.aashaarcard[0]) {
-        aadharUrl = await uploadFile(files.aashaarcard, files.aashaarcard[0].originalname);
-      } else {
-        return res.status(400).json({ error: "No Aadhar card provided" });
-      }
-
-      // Upload other required files
-      if (!files.nocLetter || !files.nocLetter[0]) {
-        return res.status(400).json({ error: "NOC Letter is required" });
-      }
-      if (!files.buildingPermission || !files.buildingPermission[0]) {
-        return res.status(400).json({ error: "Building Permission is required" });
-      }
-      if (!files.placePicture || !files.placePicture[0]) {
-        return res.status(400).json({ error: "Place Picture is required" });
-      }
-
+      const aadharUrl = await uploadFile(files.aashaarcard, files.aashaarcard[0].originalname)
       const nocUrl = await uploadFile(files.nocLetter, files.nocLetter[0].originalname)
       const buildingUrl = await uploadFile(files.buildingPermission, files.buildingPermission[0].originalname)
       const picUrl = await uploadFile(files.placePicture, files.placePicture[0].originalname)
@@ -757,13 +737,11 @@ app.get("/api/dashboard/booking-trends", async (req, res) => {
   }
 })
 
-// Get revenue insights - platform fees and totals aggregated (Admin gets 98% of total bookings)
+// Get revenue insights - platform fees and totals aggregated
 app.get("/api/dashboard/revenue-insights", async (req, res) => {
   try {
     const placesSnapshot = await db.collection("places").get()
-    let totalBookingAmount = 0  // Total amount from all bookings
-    let platformRevenue = 0     // 98% of total bookings (admin's share)
-    let ownerRevenue = 0        // 2% of total bookings (owners' share)
+    let totalRevenue = 0
     let totalBookings = 0
     const revenueByPlace = {}
     const revenueByVehicleType = {}
@@ -774,52 +752,43 @@ app.get("/api/dashboard/revenue-insights", async (req, res) => {
 
       const reservationsSnapshot = await db.collection("places").doc(placeId).collection("reservations").get()
 
-      let placeBookingAmount = 0  // Total booking amount for this place
-      let placePlatformRevenue = 0 // Platform's 98% share from this place
+      let placeRevenue = 0
       let placeBookings = 0
 
       reservationsSnapshot.forEach((reservationDoc) => {
         const reservation = reservationDoc.data()
+        const platformFee = Number.parseFloat(reservation.platform_fee || 0)
         const totalAmount = Number.parseFloat(reservation.total_amount || 0)
         const vehicleType = reservation.vehicleType || "unknown"
 
-        // Calculate platform (98%) and owner (2%) shares
-        const ownerShare = totalAmount * 0.02  // 2% to owner
-        const platformShare = totalAmount * 0.98  // 98% to platform
-
-        totalBookingAmount += totalAmount
-        platformRevenue += platformShare
-        ownerRevenue += ownerShare
-        placeBookingAmount += totalAmount
-        placePlatformRevenue += platformShare
+        // Use total amount paid by user, not just platform fee
+        totalRevenue += totalAmount
+        placeRevenue += totalAmount
         totalBookings += 1
         placeBookings += 1
 
-        // Revenue by vehicle type (showing platform's share)
+        // Revenue by vehicle type
         if (!revenueByVehicleType[vehicleType]) {
           revenueByVehicleType[vehicleType] = { revenue: 0, count: 0 }
         }
-        revenueByVehicleType[vehicleType].revenue += platformShare
+        revenueByVehicleType[vehicleType].revenue += totalAmount
         revenueByVehicleType[vehicleType].count += 1
       })
 
       if (placeBookings > 0) {
         revenueByPlace[placeId] = {
           placeName: placeData.placeName || placeId,
-          revenue: placePlatformRevenue.toFixed(2),  // Platform's share from this place
-          totalBookingAmount: placeBookingAmount.toFixed(2),  // Total booking amount
+          revenue: placeRevenue,
           bookings: placeBookings,
-          averageRevenue: (placePlatformRevenue / placeBookings).toFixed(2),
+          averageRevenue: placeRevenue / placeBookings,
         }
       }
     }
 
     res.status(200).json({
-      totalRevenue: platformRevenue.toFixed(2),  // Platform's 98% revenue
-      totalBookingAmount: totalBookingAmount.toFixed(2),  // Total amount from all bookings
-      ownerRevenue: ownerRevenue.toFixed(2),  // Total 2% paid to owners
+      totalRevenue: totalRevenue.toFixed(2),
       totalBookings,
-      averageRevenuePerBooking: totalBookings > 0 ? (platformRevenue / totalBookings).toFixed(2) : 0,
+      averageRevenuePerBooking: totalBookings > 0 ? (totalRevenue / totalBookings).toFixed(2) : 0,
       revenueByPlace,
       revenueByVehicleType,
     })
@@ -891,43 +860,41 @@ app.get("/api/dashboard/owner/:email", async (req, res) => {
   try {
     const { email } = req.params
 
-    // Get owner's registered places from the main places collection directly
-    const placesSnapshot = await db.collection("places").where("ownerEmail", "==", email).get()
+    // Get owner's registered places
+    const placesSnapshot = await db.collection("users").doc(email).collection("register").get()
     const ownerPlaces = placesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
 
     let totalRevenue = 0
     let totalBookings = 0
     const placeMetrics = []
 
-    // Process each place individually
     for (const place of ownerPlaces) {
-      const reservationsSnapshot = await db.collection("places").doc(place.id).collection("reservations").get()
+      // Find corresponding place in main places collection
+      const mainPlaceSnapshot = await db.collection("places").where("userEmail", "==", email).get()
 
-      // placeTotalAmount = sum of booking totals for this place
-      let placeTotalAmount = 0
-      const placeBookings = reservationsSnapshot.size
+      for (const mainPlaceDoc of mainPlaceSnapshot.docs) {
+        const reservationsSnapshot = await db.collection("places").doc(mainPlaceDoc.id).collection("reservations").get()
 
-      // Sum all reservation totals for this place
-      reservationsSnapshot.forEach((reservationDoc) => {
-        const reservation = reservationDoc.data()
-        const totalAmount = Number.parseFloat(reservation.total_amount || 0) || 0
-        placeTotalAmount += totalAmount
-      })
+        let placeRevenue = 0
+        const placeBookings = reservationsSnapshot.size
 
-      // Owner earns 2% of the total bookings for their place
-      const ownerShare = placeTotalAmount * 0.02
+        reservationsSnapshot.forEach((reservationDoc) => {
+          const reservation = reservationDoc.data()
+          const totalAmount = Number.parseFloat(reservation.total_amount || 0)
+          placeRevenue += totalAmount
+        })
 
-      totalRevenue += ownerShare
-      totalBookings += placeBookings
+        totalRevenue += placeRevenue
+        totalBookings += placeBookings
 
-      placeMetrics.push({
-        placeId: place.id,
-        placeName: place.placeName,
-        // report owner's share as revenue for this place
-        revenue: ownerShare.toFixed(2),
-        bookings: placeBookings,
-        verified: place.verified || false,
-      })
+        placeMetrics.push({
+          placeId: mainPlaceDoc.id,
+          placeName: place.placeName,
+          revenue: placeRevenue,
+          bookings: placeBookings,
+          verified: place.verified || false,
+        })
+      }
     }
 
     res.status(200).json({

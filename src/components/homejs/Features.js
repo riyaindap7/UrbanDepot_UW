@@ -33,7 +33,7 @@ const Features = () => {
     <section className="features" id="features">
       <div className="container">
         <div className="section-header">
-          <h2>Why Choose UrbanDepot?</h2>
+          <h2>Why Choose urbandepot?</h2>
           <p>Experience the future of parking with our innovative features</p>
         </div>
         <div className="features-grid">

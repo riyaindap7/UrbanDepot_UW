@@ -39,7 +39,7 @@ const Navbar = ({ userEmail }) => {
         <Link to="/map">
           <img src="/urbanlogo1.png" alt="Urban Depot Logo" className="urban-logo" />
         </Link>
-        <h1 className="urban-navbar-title">UrbanDepot</h1>
+        <h1 className="urban-navbar-title">urbandepot</h1>
       </div>
       <div className="urban-navbar-links">
         <Link to="/map" className="no-hover" onClick={handleLinkClick}>
