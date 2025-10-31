@@ -1052,15 +1052,18 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../build')))
   
   // Handle React routing - return all requests to React app (except API routes)
-  app.get('*', (req, res) => {
+  // This must be the LAST route defined
+  app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../build', 'index.html'))
   })
 } else {
-  console.log('Running in development mode - frontend served separately')
+  console.log('🔧 Running in development mode - frontend served separately')
 }
 
 // ✅ Start the server
 app.listen(PORT, () => {
   console.log(`✅ Backend server running at http://localhost:${PORT}`)
-  console.log(`📁 Serving static files from: ${path.join(__dirname, '../build')}`)
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`📁 Serving static files from: ${path.join(__dirname, '../build')}`)
+  }
 })

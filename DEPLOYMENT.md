@@ -1,5 +1,17 @@
 # Deployment Instructions for Render
 
+## Recent Fixes
+
+### CI/CD Pipeline Error - FIXED ✅
+**Error:** `TypeError: Missing parameter name at 1: https://git.new/pathToRegexpError`
+
+**Cause:** The catch-all route pattern `app.get('*')` was causing issues with the `path-to-regexp` library in Express.
+
+**Solution:** Changed from `app.get('*')` to `app.get(/^(?!\/api).*/)` which uses a regex pattern that:
+- Matches all routes that DON'T start with `/api`
+- Is compatible with `path-to-regexp`
+- Properly handles React Router routes
+
 ## Problem Fixed
 The "404 Not Found" error when refreshing pages or navigating directly to routes in your React SPA has been fixed.
 
