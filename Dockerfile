@@ -18,6 +18,9 @@ ENV REACT_APP_API_URL=$REACT_APP_API_URL
 # Build the application with the API URL baked in
 RUN npm run build
 
+# Explicitly copy _redirects file to build folder (for compatibility)
+RUN cp -f public/_redirects build/_redirects 2>/dev/null || echo "No _redirects file found, skipping..."
+
 # Verify build output
 RUN ls -la /app/build && echo "Build completed successfully"
 

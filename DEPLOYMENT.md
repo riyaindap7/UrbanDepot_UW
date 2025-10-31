@@ -2,6 +2,16 @@
 
 ## Recent Fixes
 
+### Frontend Build Error - FIXED ✅
+**Error:** `sh: xcopy: not found` / `sh: copy: not found` during Docker build
+
+**Cause:** The `postbuild` script used Windows-specific commands (`xcopy`, `copy`) but Docker containers run Linux.
+
+**Solution:** 
+- Removed the `postbuild` script from `package.json`
+- Added explicit copy of `_redirects` file in the Dockerfile using Linux `cp` command
+- nginx configuration already handles SPA routing with `try_files`
+
 ### CI/CD Pipeline Error - FIXED ✅
 **Error:** `TypeError: Missing parameter name at 1: https://git.new/pathToRegexpError`
 
