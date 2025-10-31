@@ -31,14 +31,23 @@ FROM nginx:stable-alpine
 # Install curl for health checks
 RUN apk add --no-cache curl
 
-# Remove default nginx website
-RUN rm -rf /usr/share/nginx/html/*
+# Remove default nginx website and config
+RUN rm -rf /usr/share/nginx/html/* && \
+    rm -f /etc/nginx/conf.d/default.conf
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built application
 COPY --from=build /app/build /usr/share/nginx/html
+
+# Verify files are copied correctly and show structure
+RUN echo "=== Checking nginx html directory ===" && \
+    ls -la /usr/share/nginx/html && \
+    echo "=== Checking if index.html exists ===" && \
+    test -f /usr/share/nginx/html/index.html && echo "✓ index.html found" || echo "✗ index.html NOT found" && \
+    echo "=== Showing nginx config ===" && \
+    cat /etc/nginx/conf.d/default.conf
 
 # Create health check script
 RUN echo '#!/bin/sh\ncurl -f http://localhost:8080/health || exit 1' > /healthcheck.sh && \
