@@ -26,12 +26,14 @@ router.get("/run-demo", (req, res) => {
       const match = line.match(/Detected Entry Time: (.+)/);
       if (match) {
         entryTime = match[1].trim();
+        console.log(`✅ Captured Entry Time from Python: "${entryTime}"`);
       }
     }
     if (line.includes("Detected Exit Time:")) {
       const match = line.match(/Detected Exit Time: (.+)/);
       if (match) {
         exitTime = match[1].trim();
+        console.log(`✅ Captured Exit Time from Python: "${exitTime}"`);
       }
     }
   });
@@ -60,10 +62,13 @@ router.get("/run-demo", (req, res) => {
 
   py.on("close", (code) => {
     console.log(`child process exited with code ${code}`);
+    console.log(`📅 Captured Entry Time: ${entryTime}`);
+    console.log(`📅 Captured Exit Time: ${exitTime}`);
+    
     res.json({
       logs,
-      entryTime,
-      exitTime,
+      entryTime: entryTime || "Not detected",
+      exitTime: exitTime || "Not detected",
       isMockData: false
     });
   });

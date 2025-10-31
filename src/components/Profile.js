@@ -279,22 +279,31 @@ const [demoExitTime, setDemoExitTime] = useState(null);
             // Reset demo times before running
             setDemoEntryTime(null);
             setDemoExitTime(null);
+            console.log("🔄 Starting demo feed...");
 
             // Run demo script asynchronously
            fetch(`${process.env.REACT_APP_API_URL}/api/run-demo`)
           .then(res => res.json())
           .then(data => {
-            console.log("Demo response data:", data);
-            if (data.entryTime) {
-              console.log("Setting entry time:", data.entryTime);
+            console.log("📦 Full demo response data:", data);
+            console.log("📦 Entry Time from backend:", data.entryTime);
+            console.log("📦 Exit Time from backend:", data.exitTime);
+            
+            if (data.entryTime && data.entryTime !== "Not detected") {
+              console.log("✅ Setting entry time in state:", data.entryTime);
               setDemoEntryTime(data.entryTime);
+            } else {
+              console.warn("⚠️ Entry time not detected or invalid");
             }
-            if (data.exitTime) {
-              console.log("Setting exit time:", data.exitTime);
+            
+            if (data.exitTime && data.exitTime !== "Not detected") {
+              console.log("✅ Setting exit time in state:", data.exitTime);
               setDemoExitTime(data.exitTime);
+            } else {
+              console.warn("⚠️ Exit time not detected or invalid");
             }
           })
-          .catch(err => console.error("Error running demo:", err));
+          .catch(err => console.error("❌ Error running demo:", err));
 
           }}
         >
@@ -346,6 +355,9 @@ const [demoExitTime, setDemoExitTime] = useState(null);
                       <span className="label">Detected Exit Time:</span>
                       <span className="value">{demoExitTime || "--"}</span>
                     </div>
+                    
+                    {/* Debug: Show what values are in state */}
+                    {console.log(`🖥️ Displaying - Entry: ${demoEntryTime}, Exit: ${demoExitTime}`)}
                   </div>
                 </div>
               ))}
