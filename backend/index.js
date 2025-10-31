@@ -1044,7 +1044,23 @@ app.get("/api/dashboard/user/:email", async (req, res) => {
   }
 })
 
+// ============================
+// 🔻 Serve React Frontend in Production
+// ============================
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React build folder
+  app.use(express.static(path.join(__dirname, '../build')))
+  
+  // Handle React routing - return all requests to React app (except API routes)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build', 'index.html'))
+  })
+} else {
+  console.log('Running in development mode - frontend served separately')
+}
+
 // ✅ Start the server
 app.listen(PORT, () => {
   console.log(`✅ Backend server running at http://localhost:${PORT}`)
+  console.log(`📁 Serving static files from: ${path.join(__dirname, '../build')}`)
 })
